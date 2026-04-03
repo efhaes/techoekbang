@@ -1,0 +1,97 @@
+{% extends 'includes/list_base.html' %}
+
+{% block list_title %}Data Ketahanan Pangan{% endblock %}
+{% load static%}
+{% block list_extra_css %}
+<style>
+    :root {
+        --primary-color: #10b981; /* Hijau */
+        --primary-hover: #059669;
+        --primary-light: rgba(16, 185, 129, 0.1);
+    }
+
+    /* 1. Tombol Tambah & Tombol Ajukan */
+    .btn-primary {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+    }
+    .btn-primary:hover {
+        background-color: var(--primary-hover) !important;
+    }
+
+    /* 2. Tombol Detail (Outline) */
+    .btn-outline-primary {
+        border-color: var(--primary-color) !important;
+        color: var(--primary-color) !important;
+    }
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+    }
+
+    /* 3. Garis Header (Yang tadi masih ungu) */
+    #main-content .page-header::before {
+        background: var(--primary-color) !important;
+    }
+
+    /* 4. Select Tahun Focus */
+    #main-content .form-select-sm:focus {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 3px var(--primary-light) !important;
+    }
+
+    /* 5. Hover Card */
+    #main-content .table-card:hover {
+        box-shadow: 0 6px 20px var(--primary-light) !important;
+    }
+</style>
+{% endblock %}
+{% block add_button %}
+<a href="{% url 'ketahanan_pangan_create' %}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i> Tambah Data
+</a>
+{% endblock %}
+
+{% block item_title %}{{ obj.nama_kelompok }}{% endblock %}
+
+{% block item_subtitle %}
+    SK: {{ obj.nomor_sk|default:"-" }} | {{ obj.tanggal_sk|date:"d M Y"|default:"-" }}
+{% endblock %}
+
+{% block item_status_icon %}
+    {% if obj.status == 'draft' %}📝
+    {% elif obj.status == 'diajukan' %}⏳
+    {% elif obj.status == 'disetujui' %}✅
+    {% else %}❌{% endif %}
+{% endblock %}
+
+{% block item_body %}
+<div class="row small text-muted">
+    <div class="col-md-4"><strong>Ketua:</strong> {{ obj.ketua|default:"-" }}</div>
+    <div class="col-md-4"><strong>Anggaran:</strong> Rp {{ obj.pembiayaan_anggaran|floatformat:0 }}</div>
+</div>
+<div class="mt-2 small">
+    <strong>Jenis Usaha:</strong>
+    {% if obj.usaha_pertanian %}<span class="badge-usaha">Pertanian</span>{% endif %}
+    {% if obj.usaha_peternakan %}<span class="badge-usaha">Peternakan</span>{% endif %}
+    </div>
+{% endblock %}
+
+{% block item_actions %}
+<a href="{% url 'ketahanan_pangan_detail' obj.pk %}" class="btn btn-sm btn-outline-primary">Detail</a>
+
+{% if obj.status == 'draft' or obj.status == 'ditolak' %}
+    <a href="{% url 'ketahanan_pangan_edit' obj.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalHapus" data-url="{% url 'ketahanan_pangan_delete' obj.pk %}">Hapus</button>
+    <form method="POST" action="{% url 'ketahanan_pangan_submit' obj.pk %}" class="d-inline">
+        {% csrf_token %}<button type="submit" class="btn btn-sm btn-primary">Ajukan</button>
+    </form>
+{% endif %}
+{% endblock %}
+
+{% block empty_state %}
+<div class="table-card text-center py-5">
+    <div style="font-size:48px;">🌾</div>
+    <h6 class="mt-3 fw-bold">Belum ada data</h6>
+</div>
+{% endblock %}

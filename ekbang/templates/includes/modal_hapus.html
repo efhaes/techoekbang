@@ -1,0 +1,42 @@
+<div class="modal fade" id="modalHapus" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius:14px;">
+      <div class="modal-header border-0">
+        <h6 class="modal-title fw-bold">
+          <i class="bi bi-trash me-2 text-danger"></i>Konfirmasi Hapus
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+        <form method="POST" id="formHapus">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash me-1"></i> Hapus Permanen
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Script untuk mengisi action URL secara dinamis
+  document.addEventListener('DOMContentLoaded', function() {
+    const modalHapus = document.getElementById('modalHapus');
+    if (modalHapus) {
+      modalHapus.addEventListener('show.bs.modal', function (event) {
+        // Tombol yang memicu modal
+        const button = event.relatedTarget;
+        // Ambil URL dari atribut data-url
+        const url = button.getAttribute('data-url');
+        // Update action pada form di dalam modal
+        const form = document.getElementById('formHapus');
+        form.action = url;
+      });
+    }
+  });
+</script>

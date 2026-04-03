@@ -1,0 +1,247 @@
+
+    /* ── Variabel Warna & Font ── */
+    :root {
+        --primary: #f97316; /* Orange BLT */
+        --primary-dark: #ea580c;
+        --primary-light: #fff7ed;
+        --secondary: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --bg-body: #f8fafc;
+        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        --border-color: #e2e8f0;
+    }
+
+    body {
+        background-color: var(--bg-body);
+        color: #1e293b;
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h4 {
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+
+    .page-header p {
+        color: var(--secondary);
+        font-size: 0.95rem;
+    }
+
+    /* ── Custom Select Tahun ── */
+    .form-select-tahun {
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    /* Beri padding kanan 2.5rem supaya teks tidak kena panah */
+    padding: 0.4rem 2.5rem 0.4rem 1rem; 
+    font-weight: 600;
+    color: var(--secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #fff;
+    font-size: 14px;
+    
+    /* Menghilangkan panah bawaan browser */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Menambahkan panah custom (SVG Bootstrap Icons) */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center; /* Jarak panah dari kanan */
+    background-size: 12px;
+}
+
+.form-select-tahun:hover {
+    border-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f97316' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.form-select-tahun:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+    /* ── Table Container (Sleek Look) ── */
+    .table-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .table-card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .table-card-title {
+        font-weight: 700;
+        color: #334155;
+    }
+
+    /* ── Table Styling ── */
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #fcfcfd;
+        color: var(--secondary);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 1.25rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table tbody tr {
+        transition: background 0.2s;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .table tbody td {
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* ── Badge Status (Pill Style) ── */
+    .badge {
+        font-weight: 600;
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-draft { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .badge-diajukan { background: #fffbeb; color: #b45309; border: 1px solid #fef3c7; }
+    .badge-disetujui { background: #ecfdf5; color: #047857; border: 1px solid #d1fae5; }
+    .badge-ditolak { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+
+    /* ── Action Buttons ── */
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: #fff;
+        color: var(--secondary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+    }
+
+    .btn-action:hover {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    }
+
+    .btn-action.danger:hover {
+        background: var(--danger);
+        border-color: var(--danger);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
+    /* ── Modal Styling (Modern & Round) ── */
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        padding: 1.5rem 1.5rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .modal-title {
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    /* ── Form Styling inside Modal ── */
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--border-color);
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px var(--primary-light);
+    }
+
+    .input-group-text {
+        border-radius: 10px;
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+    }
+
+    /* ── Button Primary Dashboard ── */
+    .btn-primary {
+        background: var(--primary) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.6rem 1.25rem !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+        transition: all 0.2s !important;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3);
+    }
+
+    /* ── Alert Penolakan ── */
+    .alert-tolak {
+        background: #fff1f2;
+        border: 1px solid #fee2e2;
+        border-left: 4px solid var(--danger);
+        color: #991b1b;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        margin: 0.5rem 1.5rem 1.5rem;
+    }

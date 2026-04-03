@@ -1,0 +1,328 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  /* Membatasi lebar area tombol sticky */
+    .sticky-submit .container-limit {
+        max-width: 900px; /* Lebar maksimal area tombol agar pas dengan form */
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Ukuran tombol yang lebih pas (tidak raksasa) */
+    .btn-custom {
+        padding: 10px 24px;
+        font-size: 0.95rem;
+    }
+    :root {
+        --primary-color: #14b8a6;
+        --primary-light: #f0fdfa;
+    }
+
+    .form-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--primary-light);
+    }
+
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-light);
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    /* Penekanan pada input yang sedang aktif */
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .upload-box {
+        border: 2px dashed #e2e8f0;
+        padding: 15px;
+        border-radius: 8px;
+        background: #f8fafc;
+        transition: all 0.3s;
+    }
+
+    .upload-box:hover {
+        border-color: var(--primary-color);
+        background: var(--primary-light);
+    }
+
+    .sticky-submit {
+        position: sticky;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        padding: 15px 0;
+        border-top: 1px solid #e2e8f0;
+        z-index: 100;
+        margin-top: 40px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-5">
+    <div class="page-header mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'koperasi_list' %}">Koperasi</a></li>
+                <li class="breadcrumb-item active">Tambah Data</li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold text-dark">Lengkapi Data Koperasi</h3>
+        <p class="text-muted">Mohon isi formulir di bawah ini sesuai dengan dokumen asli koperasi Bapak/Ibu.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="koperasiForm">
+        {% csrf_token %}
+
+        <div class="form-card">
+            <div class="form-section-header">
+                <div class="icon-circle"><i class="bi bi-building"></i></div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Identitas Koperasi</h5>
+                    <p class="text-muted small mb-0">Informasi dasar sesuai akta pendirian</p>
+                </div>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label text-danger">Tahun Anggaran</label>
+                    {{ form.tahun_anggaran }}
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label">Nama Koperasi <span class="text-danger">*</span></label>
+                    {{ form.nama_koperasi }}
+                    <div class="help-text">Contoh: Koperasi Unit Desa (KUD) Makmur Sejahtera</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nomor SK</label>
+                    {{ form.nomor_sk }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tanggal SK</label>
+                    {{ form.tanggal_sk }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nomor Akta Notaris</label>
+                    {{ form.akta_notaris_nomor }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-header">
+                <div class="icon-circle text-success"><i class="bi bi-people"></i></div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Susunan Pengurus</h5>
+                    <p class="text-muted small mb-0">Daftar orang yang mengelola koperasi</p>
+                </div>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Nama Ketua</label>
+                    {{ form.ketua }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Sekretaris</label>
+                    {{ form.sekretaris }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Bendahara</label>
+                    {{ form.bendahara }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Wakil Bidang Anggota</label>
+                    {{ form.wakil_bidang_anggota }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Wakil Bidang Usaha</label>
+                    {{ form.wakil_bidang_usaha }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-header">
+                <div class="icon-circle text-warning"><i class="bi bi-shield-check"></i></div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Susunan Pengawas</h5>
+                    <p class="text-muted small mb-0">Daftar orang yang mengawasi kinerja koperasi</p>
+                </div>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Ketua Pengawas</label>
+                    {{ form.ketua_pengawas }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Anggota Pengawas 1</label>
+                    {{ form.anggota_pengawas_1 }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Anggota Pengawas 2</label>
+                    {{ form.anggota_pengawas_2 }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-header">
+                <div class="icon-circle text-info"><i class="bi bi-file-earmark-arrow-up"></i></div>
+                <div>
+                    <h5 class="mb-0 fw-bold">Upload Dokumen</h5>
+                    <p class="text-muted small mb-0">Format PDF/Word, Maksimal 5MB per file</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="upload-box">
+                        <label class="form-label d-block"><i class="bi bi-file-pdf me-1 text-danger"></i> Berkas SK Koperasi</label>
+                        <input type="file" name="file_sk" class="form-control" accept=".pdf,.doc,.docx">
+                        {% if form.instance.file_sk %}
+                            <div class="mt-2 small"><i class="bi bi-check-circle-fill text-success"></i> File sudah ada: <a href="{{ form.instance.file_sk.url }}" target="_blank">Lihat Berkas</a></div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="upload-box">
+                        <label class="form-label d-block"><i class="bi bi-file-earmark-spreadsheet me-1 text-success"></i> Berkas RAPBK</label>
+                        <input type="file" name="file_rapbk" class="form-control" accept=".pdf,.doc,.docx">
+                        {% if form.instance.file_rapbk %}
+                            <div class="mt-2 small"><i class="bi bi-check-circle-fill text-success"></i> File sudah ada: <a href="{{ form.instance.file_rapbk.url }}" target="_blank">Lihat Berkas</a></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <div class="sticky-submit shadow-sm">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <button type="button" class="btn btn-light px-3 py-2 border" data-bs-toggle="modal" data-bs-target="#modalBatal">
+                <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline">Batal</span>
+            </button>
+            
+            <button type="submit" class="btn btn-primary px-4 py-2 fw-bold shadow-sm" style="min-width: 200px;">
+                <i class="bi bi-save me-2"></i> Simpan Data
+            </button>
+        </div>
+    </div>
+    </form>
+</div>
+
+<div class="modal fade" id="modalBatal" tabindex="-1" aria-labelledby="modalBatalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="fw-bold">Batalkan Pengisian?</h5>
+                <p class="text-muted">Data yang sudah Bapak/Ibu ketik tidak akan disimpan. Yakin ingin membatalkan?</p>
+                <div class="d-flex gap-2 justify-content-center mt-4">
+                    <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">Lanjutkan Isi Data</button>
+                    <a href="{% url 'koperasi_list' %}" class="btn btn-danger px-4">Ya, Batalkan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Menambahkan class bootstrap ke elemen form secara otomatis jika belum ada
+    document.querySelectorAll('input, select, textarea').forEach(function(el) {
+        if(!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+            el.classList.add('form-control');
+        }
+    });
+
+    // Konfirmasi sebelum meninggalkan halaman jika sudah mengisi
+    let formChanged = false;
+    document.getElementById('koperasiForm').addEventListener('change', () => formChanged = true);
+    window.addEventListener('beforeunload', (e) => {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+
+    const koperasiForm = document.getElementById('koperasiForm');
+    const btnBatal = document.querySelector('[data-bs-target="#modalBatal"]');
+    const urlBatal = "{% url 'koperasi_list' %}";
+    let formChanged = false;
+
+    // 1. Tambahkan class bootstrap otomatis
+    document.querySelectorAll('input, select, textarea').forEach(function(el) {
+        if(!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+            el.classList.add('form-control');
+        }
+    });
+
+    // 2. Pantau perubahan form
+    koperasiForm.addEventListener('input', () => formChanged = true);
+    koperasiForm.addEventListener('change', () => formChanged = true);
+
+    // 3. Logika Cerdas Tombol Batal
+    btnBatal.addEventListener('click', function(e) {
+        if (!formChanged) {
+            // Jika belum ada yang diisi, langsung pindah halaman tanpa modal
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = urlBatal;
+        }
+    });
+
+    // 4. Konfirmasi browser (saat klik refresh atau tutup tab)
+    window.addEventListener('beforeunload', (e) => {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+</script>
+{% endblock %}

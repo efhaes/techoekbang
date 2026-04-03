@@ -1,0 +1,210 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+{% block page_title %}Koperasi — Monitoring Kecamatan{% endblock %}
+
+{% block content %}
+<style>
+    /* THEME ADAPTATION (BLUE PROFESSIONAL) */
+    :root {
+        --kop-primary: #0ea5e9; 
+        --kop-bg-light: #f0f9ff;    
+        --kop-border: #e0f2fe;  
+    }
+
+    .page-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--kop-border); }
+    .page-header h4 { font-weight: 800; color: #1e293b; margin: 0; }
+    .page-header p { font-size: 13px; color: var(--text-muted); margin: 5px 0 0 0; }
+
+    /* GRID & CARDS (SAME AS INFRA) */
+    .filter-card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+    
+    .card-item {
+        position: relative; overflow: hidden; cursor: pointer; border-radius: 16px; padding: 1.25rem;
+        display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+        background: #ffffff; border: 1px solid var(--kop-border); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 110px; box-shadow: var(--shadow-sm);
+    }
+    .card-item:hover { transform: translateY(-5px); border-color: var(--kop-primary); background: var(--kop-bg-light); }
+    .card-item.active { background: var(--kop-primary); border-color: var(--kop-primary); box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.2); }
+    .card-item small { z-index: 2; font-weight: 700; text-transform: uppercase; color: var(--kop-primary); font-size: 0.65rem; margin-bottom: 6px; }
+    .card-item span { z-index: 2; font-weight: 800; font-size: 1.15rem; color: #1e293b; line-height: 1.2; }
+    .card-item.active small, .card-item.active span, .card-item.active .card-info-extra { color: #ffffff; }
+
+    .card-icon-bg { position: absolute; right: -10px; bottom: -10px; color: var(--kop-primary); opacity: 0.05; transform: rotate(-15deg); transition: 0.4s; }
+    .card-item.active .card-icon-bg { color: #ffffff; opacity: 0.2; }
+
+    /* NAVIGATION & FILTERS */
+    .btn-back { display: inline-flex; align-items: center; padding: 8px 16px; background: #fff; border: 1px solid var(--kop-border); border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--kop-primary); cursor: pointer; margin-bottom: 1.5rem; gap: 8px; }
+    .filter-pill { padding: 8px 18px; border-radius: 25px; border: 1px solid var(--kop-border); background: #fff; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+    .filter-pill.active-status { background: var(--kop-primary); color: #fff; border-color: var(--kop-primary); }
+
+    /* TABLE STYLING */
+    .table-card { background: white; border-radius: 16px; border: 1px solid var(--kop-border); box-shadow: var(--shadow); overflow: hidden; }
+    .badge-diajukan { background: #e0f2fe; color: #0369a1; }
+    .badge-disetujui { background: #dcfce7; color: #15803d; }
+    .badge-ditolak { background: #fee2e2; color: #b91c1c; }
+
+    .btn-action { background: #f8fafc; color: var(--kop-primary); width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; }
+    .btn-action:hover { background: var(--kop-primary); color: #fff; }
+</style>
+
+<div class="page-header">
+    <h4>Monitoring Koperasi</h4>
+    <p>Kelola legalitas dan verifikasi data koperasi di tingkat kecamatan.</p>
+</div>
+
+<div id="backButton" style="display:none;">
+    <div class="btn-back" onclick="resetFilter()"><i class="bi bi-arrow-left"></i> Ganti Filter</div>
+</div>
+
+<div id="yearSelection">
+    <p class="fw-bold text-muted small mb-3">PILIH TAHUN ANGGARAN</p>
+    <div class="filter-card-container">
+        {% for t in tahun_list %}
+        <div class="card-item" onclick="selectYear({{ t }})" data-tahun="{{ t }}">
+            <small>Data Tahun</small>
+            <span>{{ t }}</span>
+            <i class="bi bi-calendar3 card-icon-bg" style="font-size: 4rem;"></i>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="desaSelection" style="display:none;">
+    <p class="fw-bold text-muted small mb-3">PILIH DESA WILAYAH</p>
+    <div class="filter-card-container">
+        {% for desa in desa_list %}
+        <div class="card-item" onclick="selectDesa({{ desa.pk }}, '{{ desa.nama|escapejs }}')" data-desa="{{ desa.pk }}">
+            <small>Wilayah Desa</small>
+            <span>{{ desa.nama }}</span>
+            <i class="bi bi-building card-icon-bg" style="font-size: 4.5rem;"></i>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="dataContainer" style="display:none;">
+    <div class="status-pill-container d-flex gap-2 mb-3">
+        <button onclick="filterByStatus(this, '')" class="filter-pill active-status">Semua Koperasi</button>
+        <button onclick="filterByStatus(this, 'diajukan')" class="filter-pill">Menunggu (<span id="totalDiajukan">0</span>)</button>
+        <button onclick="filterByStatus(this, 'disetujui')" class="filter-pill">Disetujui (<span id="totalDisetujui">0</span>)</button>
+        <button onclick="filterByStatus(this, 'ditolak')" class="filter-pill">Ditolak (<span id="totalDitolak">0</span>)</button>
+    </div>
+
+    <div class="table-card">
+        <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="fw-bold text-primary"><i class="bi bi-geo-alt me-1"></i> <span id="selectedDesa"></span> / <span id="selectedYear"></span></div>
+            <div class="position-relative" style="max-width: 300px; width:100%;">
+                <input type="text" id="tableSearch" onkeyup="searchTable()" placeholder="Cari koperasi..." class="form-control form-control-sm ps-5 rounded-pill">
+                <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+            </div>
+        </div>
+        <div id="dataTable" class="table-responsive"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTolak" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px;">
+            <div class="modal-header border-0 pb-0"><h5 class="fw-bold">Tolak Koperasi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form method="POST" id="formTolak">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p class="small text-muted">Koperasi: <strong id="modalNama"></strong></p>
+                    <textarea class="form-control" name="catatan_verifikasi" rows="4" required placeholder="Alasan penolakan..." style="border-radius: 12px;"></textarea>
+                    <input type="hidden" name="status" value="ditolak">
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger px-4">Kirim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedTahun = null; let selectedDesaId = null; let currentStatus = '';
+
+    function selectYear(tahun){
+        selectedTahun = tahun;
+        document.getElementById('yearSelection').style.display='none';
+        document.getElementById('desaSelection').style.display='grid';
+        document.getElementById('backButton').style.display='block';
+    }
+
+    function selectDesa(id, name){
+        selectedDesaId = id;
+        document.getElementById('selectedYear').innerText = selectedTahun;
+        document.getElementById('selectedDesa').innerText = name;
+        loadData();
+    }
+
+    function filterByStatus(btn, status){
+        document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active-status'));
+        btn.classList.add('active-status');
+        currentStatus = status;
+        loadData();
+    }
+
+    function searchTable() {
+        let input = document.getElementById("tableSearch").value.toUpperCase();
+        let rows = document.querySelectorAll("#dataTable table tbody tr");
+        rows.forEach(row => { row.style.display = row.innerText.toUpperCase().includes(input) ? "" : "none"; });
+    }
+
+    function loadData(){
+        document.getElementById('dataContainer').style.display='none';
+        document.getElementById('desaSelection').style.display='none';
+        fetch("{% url 'koperasi_filter_api' %}?tahun="+selectedTahun+"&desa_id="+selectedDesaId+"&status="+currentStatus)
+        .then(res=>res.json()).then(data=>{
+            document.getElementById('totalDiajukan').innerText = data.summary.total_diajukan;
+            document.getElementById('totalDisetujui').innerText = data.summary.total_disetujui;
+            document.getElementById('totalDitolak').innerText = data.summary.total_ditolak;
+            renderTable(data.data);
+            document.getElementById('dataContainer').style.display='block';
+        });
+    }
+
+    function renderTable(data){
+        let html = `<table class="table mb-0">
+            <thead class="bg-light small fw-bold text-uppercase">
+                <tr><th class="ps-3">No</th><th>Nama Koperasi</th><th>Tgl Diajukan</th><th>Status</th><th class="text-center">Aksi</th></tr>
+            </thead><tbody>`;
+        data.forEach((obj, i)=>{
+            html+=`<tr>
+                <td class="ps-3 text-muted fw-bold">${i+1}</td>
+                <td><div class="fw-bold">${obj.nama_koperasi}</div><small class="text-muted">${obj.desa_nama}</small></td>
+                <td class="small">${obj.tanggal_diajukan}</td>
+                <td><span class="badge badge-${obj.status}">${obj.status_display}</span></td>
+                <td class="text-center">
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="/koperasi/kecamatan/${obj.pk}/" class="btn-action"><i class="bi bi-eye"></i></a>
+                        ${obj.status === 'diajukan' ? `
+                        <form method="POST" action="/koperasi/kecamatan/${obj.pk}/verifikasi/" class="m-0">
+                            {% csrf_token %}<input type="hidden" name="status" value="disetujui">
+                            <button type="submit" class="btn-action text-success" onclick="return confirm('Setujui?')"><i class="bi bi-check"></i></button>
+                        </form>
+                        <button class="btn-action text-danger" data-bs-toggle="modal" data-bs-target="#modalTolak" data-pk="${obj.pk}" data-nama="${obj.nama_koperasi}"><i class="bi bi-x"></i></button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>`;
+        });
+        document.getElementById('dataTable').innerHTML = html + `</tbody></table>`;
+    }
+
+    function resetFilter(){
+        document.getElementById('yearSelection').style.display='block';
+        document.getElementById('desaSelection').style.display='none';
+        document.getElementById('dataContainer').style.display='none';
+        document.getElementById('backButton').style.display='none';
+    }
+
+    document.getElementById('modalTolak').addEventListener('show.bs.modal', function (e) {
+        const btn = e.relatedTarget;
+        document.getElementById('formTolak').action = `/koperasi/kecamatan/${btn.getAttribute('data-pk')}/verifikasi/`;
+        document.getElementById('modalNama').textContent = btn.getAttribute('data-nama');
+    });
+</script>
+{% endblock %}

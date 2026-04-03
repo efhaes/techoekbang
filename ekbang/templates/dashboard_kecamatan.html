@@ -1,0 +1,228 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+{% block content_css %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #059669 0%, #065f46 100%);
+        --glass: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+        background: var(--primary-gradient);
+        border-radius: 24px;
+        padding: 3rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px -10px rgba(5, 150, 105, 0.5);
+    }
+    .welcome-banner h2 { font-weight: 800; font-size: 2rem; }
+    .welcome-banner p { font-size: 1.1rem; opacity: 0.9; max-width: 600px; }
+    
+    .btn-glass {
+        background: var(--glass);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 14px;
+        font-weight: 700;
+        backdrop-filter: blur(10px);
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-glass:hover { background: white; color: #065f46; transform: translateY(-3px); }
+
+    /* Stat Cards */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid #f1f5f9;
+        transition: 0.3s;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+    }
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); }
+    
+    .icon-box {
+        width: 50px; height: 50px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin-bottom: 1.25rem;
+        background: #f0fdf4; color: #059669;
+    }
+    .stat-label { color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: #1e293b; margin: 5px 0; }
+    .stat-badge { font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+    .badge-warn { background: #fffbeb; color: #b45309; }
+
+    /* Layout Grid */
+    .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    .card-panel { background: white; border-radius: 24px; border: 1px solid #f1f5f9; padding: 1.5rem; }
+
+    @media (max-width: 992px) { .content-grid { grid-template-columns: 1fr; } }
+
+    /* Blast Email Card */
+    .action-card {
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .action-content h6 { color: #92400e; margin-bottom: 4px; font-weight: 700; }
+    .action-content p { color: #b45309; margin-bottom: 0; font-size: 0.9rem; }
+    
+    .btn-blast {
+        background: #f59e0b;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-blast:hover { background: #d97706; transform: scale(1.05); color: white; }
+</style>
+{% endblock %}
+{% block content %}
+
+
+<div class="welcome-banner">
+    <div style="position: relative; z-index: 2;">
+        <h2>Dashboard Kecamatan</h2>
+        <p>Anda memiliki <b>{{ total_pending_all }} permohonan</b> dari desa yang menunggu untuk diverifikasi. Pastikan semua data valid sebelum disetujui.</p>
+        <div class="mt-4">
+            <a href="{% url 'bumdes_list_kecamatan' %}" class="btn-glass">
+                <i class="bi bi-clipboard-check"></i> Periksa Sekarang
+            </a>
+        </div>
+    </div>
+    <i class="bi bi-building-check" style="position: absolute; right: 40px; top: 20px; font-size: 180px; opacity: 0.1;"></i>
+</div>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 mb-4" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="action-card">
+    <div class="d-flex align-items-center gap-3">
+        <div class="icon-box" style="background: #fef3c7; color: #d97706; margin-bottom: 0;">
+            <i class="bi bi-megaphone-fill"></i>
+        </div>
+        <div class="action-content">
+            <h6>Kirim Pengingat Laporan</h6>
+            <p>Klik tombol untuk mengirim email tagihan otomatis ke desa yang belum upload dokumen sama sekali di {{ tahun_ini }}.</p>
+        </div>
+    </div>
+    <form action="{% url 'kirim_peringatan_masal' %}" method="POST" onsubmit="return confirm('Sistem akan mengirim email blast ke semua admin desa yang belum melapor. Lanjutkan?')">
+        {% csrf_token %}
+        <button type="submit" class="btn-blast">
+            <i class="bi bi-send-fill"></i> Blast Email
+        </button>
+    </form>
+</div>
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <div class="icon-box"><i class="bi bi-shop"></i></div>
+        <div class="stat-label">BUMDes</div>
+        <div class="stat-value">{{ stats.bumdes.total }}</div>
+        <span class="stat-badge badge-warn"><i class="bi bi-clock"></i> {{ stats.bumdes.pending }} Pending</span>
+    </div>
+    <div class="stat-card">
+        <div class="icon-box"><i class="bi bi-cash-stack"></i></div>
+        <div class="stat-label">BLT Dana Desa</div>
+        <div class="stat-value">{{ stats.blt.total }}</div>
+        <span class="stat-badge badge-warn"><i class="bi bi-clock"></i> {{ stats.blt.pending }} Pending</span>
+    </div>
+    <div class="stat-card">
+        <div class="icon-box"><i class="bi bi-cone-striped"></i></div>
+        <div class="stat-label">Infrastruktur</div>
+        <div class="stat-value">{{ stats.infra.total }}</div>
+        <span class="stat-badge badge-warn"><i class="bi bi-clock"></i> {{ stats.infra.pending }} Pending</span>
+    </div>
+    <div class="stat-card">
+        <div class="icon-box"><i class="bi bi-flower1"></i></div>
+        <div class="stat-label">Ketahanan Pangan</div>
+        <div class="stat-value">{{ stats.pangan.total }}</div>
+        <span class="stat-badge badge-warn"><i class="bi bi-clock"></i> {{ stats.pangan.pending }} Pending</span>
+    </div>
+    <div class="stat-card">
+        <div class="icon-box" ><i class="bi bi-people"></i></div>
+        <div class="stat-label">Koperasi</div>
+        <div class="stat-value">{{ stats.koperasi.total }}</div>
+        <span class="stat-badge badge-warn"><i class="bi bi-clock"></i> {{ stats.koperasi.pending }} Pending</span>
+    </div>
+</div>
+
+<div class="content-grid">
+    <div class="card-panel">
+        <h6 class="fw-bold mb-4">Sebaran Permohonan per Desa</h6>
+        <div style="height: 350px;">
+            <canvas id="chartDesa"></canvas>
+        </div>
+    </div>
+
+    <div class="card-panel">
+        <h6 class="fw-bold mb-4">Log Aktivitas</h6>
+        <div class="small">
+            <div class="d-flex gap-3 mb-4">
+                <div class="p-2 bg-light rounded-circle text-primary" style="height:fit-content;"><i class="bi bi-info-circle"></i></div>
+                <div>
+                    <div class="fw-bold">Sistem Aktif</div>
+                    <div class="text-muted">Monitoring berjalan normal untuk tahun anggaran 2026.</div>
+                </div>
+            </div>
+            <div class="text-center py-5">
+                <img src="{% static 'assets/img/empty.svg' %}" style="width: 80px; opacity:0.3;">
+                <p class="text-muted mt-2">Tidak ada notifikasi mendesak.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('chartDesa').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ desa_labels|safe }},
+            datasets: [{
+                label: 'Permohonan',
+                data: {{ desa_counts|safe }},
+                backgroundColor: '#10b981',
+                borderRadius: 10,
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

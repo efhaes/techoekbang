@@ -1,0 +1,271 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Detail Infrastruktur{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h4>Detail Infrastruktur</h4>
+    <p>Desa {{ obj.desa.nama }}</p>
+  </div>
+  <span class="badge badge-{{ obj.status }} px-3 py-2" style="font-size:13px;">
+    {% if obj.status == 'draft' %}📝
+    {% elif obj.status == 'diajukan' %}⏳
+    {% elif obj.status == 'disetujui' %}✅
+    {% else %}❌{% endif %}
+    {{ obj.get_status_display }}
+  </span>
+</div>
+
+{% if obj.catatan_verifikasi %}
+<div class="alert-tolak mb-3">
+  <i class="bi bi-exclamation-triangle me-2"></i>
+  <strong>Catatan Verifikasi:</strong> {{ obj.catatan_verifikasi }}
+</div>
+{% endif %}
+
+<!-- IDENTITAS -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-file-earmark-text" style="color:var(--primary)"></i>
+    Identitas Kegiatan
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">Tahun Anggaran</div>
+      <div class="fw-semibold">{{ obj.tahun_anggaran }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Nama Kegiatan</div>
+      <div class="fw-semibold">{{ obj.kegiatan }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Nomor SK</div>
+      <div class="fw-semibold">{{ obj.nomor_sk|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Anggaran</div>
+      <div class="fw-bold">Rp {{ obj.anggaran|floatformat:0 }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Sumber Anggaran</div>
+      <div class="fw-semibold">{{ obj.get_sumber_anggaran_display }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Ketua TPK</div>
+      <div class="fw-semibold">{{ obj.ketua_tpk|default:"-" }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL PEKERJAAN -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-tools" style="color:var(--primary)"></i>
+    Detail Pekerjaan
+  </div>
+  {% if obj.details.all %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Jenis</th>
+          <th>Lokasi</th>
+          <th>Volume</th>
+          <th>Keterangan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detail in obj.details.all %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ detail.get_jenis_display }}</td>
+          <td>{{ detail.lokasi }}</td>
+          <td>{{ detail.volume }}</td>
+          <td>{{ detail.keterangan_lainnya|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-muted small">Belum ada detail pekerjaan.</p>
+  {% endif %}
+</div>
+
+<!-- FOTO -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-images" style="color:var(--primary)"></i>
+    Foto Kegiatan
+  </div>
+  {% if obj.fotos.all %}
+  <div class="row g-3">
+    {% for foto in obj.fotos.all %}
+    <div class="col-md-4">
+      <div class="border rounded p-2 text-center">
+        <img src="{{ foto.foto.url }}" class="img-fluid rounded mb-2"
+          style="max-height:200px; object-fit:cover;">
+        <div class="small fw-semibold">{{ foto.get_tahap_display }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted small">Belum ada foto.</p>
+  {% endif %}
+</div>
+
+<!-- DOKUMEN -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-paperclip" style="color:var(--primary)"></i>
+    Dokumen
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">File SK</div>
+      <div class="fw-semibold">
+        {% if obj.file_sk %}
+        <a href="{{ obj.file_sk.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">File SK TPK</div>
+      <div class="fw-semibold">
+        {% if obj.file_sk_tpk %}
+        <a href="{{ obj.file_sk_tpk.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">File RAB</div>
+      <div class="fw-semibold">
+        {% if obj.file_rab %}
+        <a href="{{ obj.file_rab.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">File LPJ</div>
+      <div class="fw-semibold">
+        {% if obj.file_lpj %}
+        <a href="{{ obj.file_lpj.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Surat Pengantar</div>
+      <div class="fw-semibold">
+        {% if obj.file_surat_pengantar %}
+        <a href="{{ obj.file_surat_pengantar.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Berita Acara</div>
+      <div class="fw-semibold">
+        {% if obj.file_berita_acara %}
+        <a href="{{ obj.file_berita_acara.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RIWAYAT PENGAJUAN -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-clock-history" style="color:var(--primary)"></i>
+    Riwayat Pengajuan
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">Diajukan Oleh</div>
+      <div class="fw-semibold">{{ obj.diajukan_oleh|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Tanggal Diajukan</div>
+      <div class="fw-semibold">
+        {{ obj.tanggal_diajukan|date:"d M Y H:i"|default:"-" }}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Diverifikasi Oleh</div>
+      <div class="fw-semibold">{{ obj.diverifikasi_oleh|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Tanggal Verifikasi</div>
+      <div class="fw-semibold">
+        {{ obj.tanggal_verifikasi|date:"d M Y H:i"|default:"-" }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUTTON -->
+<div class="d-flex justify-content-end gap-2">
+  <a href="{% url 'infrastruktur_list_kecamatan' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Kembali
+  </a>
+
+  {% if obj.status == 'diajukan' %}
+  <form method="POST" action="{% url 'infrastruktur_verifikasi' obj.pk %}" class="d-inline">
+    {% csrf_token %}
+    <input type="hidden" name="status" value="disetujui">
+    <button type="submit" class="btn btn-success"
+      onclick="return confirm('Setujui data infrastruktur ini?')">
+      <i class="bi bi-check-lg me-1"></i> Setujui
+    </button>
+  </form>
+
+  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalTolak">
+    <i class="bi bi-x-lg me-1"></i> Tolak
+  </button>
+  {% endif %}
+</div>
+
+<!-- Modal Tolak -->
+<div class="modal fade" id="modalTolak" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius:14px;">
+      <div class="modal-header border-0">
+        <h6 class="modal-title fw-bold">Tolak Permohonan</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'infrastruktur_verifikasi' obj.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="ditolak">
+        <div class="modal-body">
+          <label class="form-label">
+            Alasan Penolakan <span class="text-danger">*</span>
+          </label>
+          <textarea name="catatan_verifikasi" class="form-control" rows="4"
+            placeholder="Tuliskan alasan penolakan..." required></textarea>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm"
+            data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-x-lg me-1"></i> Tolak
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

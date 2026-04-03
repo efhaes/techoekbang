@@ -1,0 +1,231 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Detail Koperasi{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h4>{{ obj.nama_koperasi }}</h4>
+    <p>Desa {{ obj.desa.nama }}</p>
+  </div>
+  <span class="badge badge-{{ obj.status }} px-3 py-2" style="font-size:13px;">
+    {% if obj.status == 'draft' %}📝
+    {% elif obj.status == 'diajukan' %}⏳
+    {% elif obj.status == 'disetujui' %}✅
+    {% else %}❌{% endif %}
+    {{ obj.get_status_display }}
+  </span>
+</div>
+
+{% if obj.catatan_verifikasi %}
+<div class="alert-tolak mb-3">
+  <i class="bi bi-exclamation-triangle me-2"></i>
+  <strong>Catatan Verifikasi:</strong> {{ obj.catatan_verifikasi }}
+</div>
+{% endif %}
+
+<!-- IDENTITAS -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-building" style="color:var(--primary)"></i> Identitas Koperasi
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">Tahun Anggaran</div>
+      <div class="fw-semibold">{{ obj.tahun_anggaran }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Nama Koperasi</div>
+      <div class="fw-semibold">{{ obj.nama_koperasi }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Nomor SK</div>
+      <div class="fw-semibold">{{ obj.nomor_sk|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Tanggal SK</div>
+      <div class="fw-semibold">{{ obj.tanggal_sk|date:"d M Y"|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Nomor Akta Notaris</div>
+      <div class="fw-semibold">{{ obj.akta_notaris_nomor|default:"-" }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- PENGURUS -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-people" style="color:var(--primary)"></i> Susunan Pengurus
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">Ketua</div>
+      <div class="fw-semibold">{{ obj.ketua|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Wakil Bidang Anggota</div>
+      <div class="fw-semibold">{{ obj.wakil_bidang_anggota|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Wakil Bidang Usaha</div>
+      <div class="fw-semibold">{{ obj.wakil_bidang_usaha|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Sekretaris</div>
+      <div class="fw-semibold">{{ obj.sekretaris|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Bendahara</div>
+      <div class="fw-semibold">{{ obj.bendahara|default:"-" }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- PENGAWAS -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-shield-check" style="color:var(--primary)"></i> Susunan Pengawas
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">Ketua Pengawas</div>
+      <div class="fw-semibold">{{ obj.ketua_pengawas|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Anggota Pengawas 1</div>
+      <div class="fw-semibold">{{ obj.anggota_pengawas_1|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Anggota Pengawas 2</div>
+      <div class="fw-semibold">{{ obj.anggota_pengawas_2|default:"-" }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- DOKUMEN -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-paperclip" style="color:var(--primary)"></i> Dokumen
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">File SK</div>
+      <div class="fw-semibold">
+        {% if obj.file_sk %}
+        <a href="{{ obj.file_sk.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">File RAPBK</div>
+      <div class="fw-semibold">
+        {% if obj.file_rapbk %}
+        <a href="{{ obj.file_rapbk.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Surat Pengantar</div>
+      <div class="fw-semibold">
+        {% if obj.file_surat_pengantar %}
+        <a href="{{ obj.file_surat_pengantar.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Berita Acara</div>
+      <div class="fw-semibold">
+        {% if obj.file_berita_acara %}
+        <a href="{{ obj.file_berita_acara.url }}" target="_blank">
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
+        </a>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RIWAYAT -->
+<div class="form-card">
+  <div class="form-section-title">
+    <i class="bi bi-clock-history" style="color:var(--primary)"></i> Riwayat Pengajuan
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="text-muted small">Diajukan Oleh</div>
+      <div class="fw-semibold">{{ obj.diajukan_oleh|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Tanggal Diajukan</div>
+      <div class="fw-semibold">{{ obj.tanggal_diajukan|date:"d M Y H:i"|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Diverifikasi Oleh</div>
+      <div class="fw-semibold">{{ obj.diverifikasi_oleh|default:"-" }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-muted small">Tanggal Verifikasi</div>
+      <div class="fw-semibold">{{ obj.tanggal_verifikasi|date:"d M Y H:i"|default:"-" }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- BUTTON -->
+<div class="d-flex justify-content-end gap-2">
+  <a href="{% url 'koperasi_list_kecamatan' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Kembali
+  </a>
+
+  {% if obj.status == 'diajukan' %}
+  <form method="POST" action="{% url 'koperasi_verifikasi' obj.pk %}" class="d-inline">
+    {% csrf_token %}
+    <input type="hidden" name="status" value="disetujui">
+    <button type="submit" class="btn btn-success"
+      onclick="return confirm('Setujui koperasi ini?')">
+      <i class="bi bi-check-lg me-1"></i> Setujui
+    </button>
+  </form>
+
+  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalTolak">
+    <i class="bi bi-x-lg me-1"></i> Tolak
+  </button>
+  {% endif %}
+</div>
+
+<!-- Modal Tolak -->
+<div class="modal fade" id="modalTolak" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius:14px;">
+      <div class="modal-header border-0">
+        <h6 class="modal-title fw-bold">Tolak Permohonan</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'koperasi_verifikasi' obj.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="ditolak">
+        <div class="modal-body">
+          <label class="form-label">
+            Alasan Penolakan <span class="text-danger">*</span>
+          </label>
+          <textarea name="catatan_verifikasi" class="form-control" rows="4"
+            placeholder="Tuliskan alasan penolakan..." required></textarea>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm"
+            data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-x-lg me-1"></i> Tolak
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

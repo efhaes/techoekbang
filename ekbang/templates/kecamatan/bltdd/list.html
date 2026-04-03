@@ -1,0 +1,415 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+{% block page_title %}BLTDD — Monitoring Kecamatan{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== THEME ADAPTATION (EMERALD GREEN) ===== */
+    :root {
+        --ekbang-primary: var(--primary); 
+        --ekbang-bg-light: var(--bg);    
+        --ekbang-border: var(--border);  
+        --ekbang-text: var(--text);      
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--ekbang-border);
+    }
+    .page-header h4 { font-weight: 800; color: var(--ekbang-text); margin: 0; }
+
+    /* ===== GRID SYSTEM ===== */
+    .filter-card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ===== MODERN LEFT-ALIGNED CARDS (PREMIUM) ===== */
+    .card-item {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        border-radius: 16px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        background: #ffffff;
+        border: 1px solid var(--ekbang-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 110px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-item:hover {
+        transform: translateY(-5px);
+        border-color: var(--ekbang-primary);
+        box-shadow: var(--shadow-md);
+        background: var(--ekbang-bg-light);
+    }
+
+    .card-item.active {
+        background: var(--ekbang-primary);
+        border-color: var(--ekbang-primary);
+        box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2);
+    }
+
+    /* Text Styling in Cards */
+    .card-item small { 
+        z-index: 2;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--ekbang-primary);
+        font-size: 0.65rem; 
+        margin-bottom: 6px;
+    }
+
+    .card-item span { 
+        z-index: 2;
+        font-weight: 800; 
+        font-size: 1.15rem; 
+        color: var(--ekbang-text);
+        line-height: 1.2;
+    }
+
+    .card-item.active small, .card-item.active span, .card-item.active .card-info-extra { 
+        color: #ffffff; 
+    }
+
+    .card-info-extra {
+        z-index: 2;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Ikon Dekoratif (Koin/Uang) */
+    .card-icon-bg {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        color: var(--ekbang-primary);
+        opacity: 0.04;
+        transform: rotate(-15deg);
+        transition: 0.4s;
+    }
+
+    .card-item:hover .card-icon-bg {
+        opacity: 0.1;
+        transform: rotate(0deg) scale(1.1);
+    }
+
+    .card-item.active .card-icon-bg {
+        color: #ffffff;
+        opacity: 0.15;
+    }
+
+    /* ===== NAVIGATION & FILTERS ===== */
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        background: #fff;
+        border: 1px solid var(--ekbang-border);
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ekbang-primary);
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+        gap: 8px;
+        transition: 0.2s;
+    }
+    .btn-back:hover { background: var(--ekbang-bg-light); border-color: var(--ekbang-primary); }
+
+    .status-pill-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-pill {
+        padding: 8px 18px;
+        border-radius: 25px;
+        border: 1px solid var(--ekbang-border);
+        background: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .filter-pill:hover, .filter-pill.active-status {
+        background: var(--ekbang-primary);
+        color: #fff;
+        border-color: var(--ekbang-primary);
+    }
+
+    /* ===== TABLE STYLING ===== */
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--ekbang-border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-card-header {
+        padding: 1.25rem;
+        background: #fafafa;
+        border-bottom: 1px solid var(--ekbang-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .table { width: 100%; border-collapse: collapse; }
+    .table th {
+        background: #f1f5f9;
+        padding: 14px 12px;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #64748b;
+        letter-spacing: 0.8px;
+        font-weight: 800;
+    }
+    .table td { padding: 15px 12px; border-top: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle; }
+
+    tr.status-ditolak { background-color: #fff1f2; }
+    tr.status-diajukan { background-color: #fffbeb; }
+    tr:hover { background-color: #f0fdf4 !important; }
+
+    /* ===== SKELETON ===== */
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        height: 20px; border-radius: 6px;
+    }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ===== BADGES & ACTIONS ===== */
+    .badge { padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .badge-diajukan { background: #fef3c7; color: #92400e; }
+    .badge-disetujui { background: #d1fae5; color: #065f46; }
+    .badge-ditolak { background: #fee2e2; color: #991b1b; }
+
+    .btn-action {
+        background: #f8fafc; color: var(--ekbang-primary);
+        width: 34px; height: 34px; border-radius: 10px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: 0.2s; border: 1px solid #e2e8f0; text-decoration: none;
+    }
+    .btn-action:hover { transform: scale(1.1); background: var(--ekbang-primary); color: #fff; }
+</style>
+
+<div class="page-header">
+    <h4>Monitoring BLT Dana Desa</h4>
+</div>
+
+<div id="backButton" style="display:none;">
+    <div class="btn-back" onclick="resetFilter()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Ganti Filter
+    </div>
+</div>
+
+<div id="yearSelection">
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; font-weight: 600;">Pilih Tahun Anggaran:</p>
+    <div class="filter-card-container">
+        {% for t in tahun_list %}
+        <div class="card-item" onclick="selectYear({{ t }})" data-tahun="{{ t }}">
+            <small>Data Tahun</small>
+            <span>{{ t }}</span>
+            <div class="card-icon-bg">
+                <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="desaSelection" style="display:none;">
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; font-weight: 600;">Pilih Desa Penerima BLTDD:</p>
+    <div class="filter-card-container">
+        {% for desa in desa_list %}
+        <div class="card-item" onclick="selectDesa({{ desa.pk }}, '{{ desa.nama|escapejs }}')" data-desa="{{ desa.pk }}">
+            <small>Wilayah Desa</small>
+            <span>{{ desa.nama }}</span>
+            <div class="card-info-extra">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Monitoring Realisasi
+            </div>
+            <div class="card-icon-bg">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M12 18V10"></path><path d="M16 14H8"></path><path d="M2 10h20"></path></svg>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="dataContainer" style="display:none;">
+    <div class="status-pill-container">
+        <button onclick="filterByStatus(this, '')" class="filter-pill active-status">Semua Status</button>
+        <button onclick="filterByStatus(this, 'diajukan')" class="filter-pill">Diajukan</button>
+        <button onclick="filterByStatus(this, 'disetujui')" class="filter-pill">Disetujui</button>
+        <button onclick="filterByStatus(this, 'ditolak')" class="filter-pill">Ditolak</button>
+    </div>
+
+    <div class="table-card">
+        <div class="table-card-header">
+            <div style="font-size: 15px; font-weight: 800; color: var(--ekbang-primary); display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span id="selectedDesa"></span> <span style="opacity:0.3; margin:0 5px;">/</span> <span id="selectedYear"></span>
+            </div>
+            
+            <div style="position: relative; width: 100%; max-width: 320px;">
+                <input type="text" id="tableSearch" onkeyup="searchTable()" placeholder="Cari data realisasi..." 
+                       style="width: 100%; padding: 10px 15px 10px 40px; border-radius: 14px; border: 1px solid var(--ekbang-border); font-size: 13px; outline: none;">
+                <svg style="position: absolute; left: 14px; top: 12px; color: var(--text-muted);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+        </div>
+        <div style="overflow-x: auto;">
+            <div id="dataTable"></div>
+        </div>
+    </div>
+</div>
+
+<div id="loadingIndicator" style="display:none; padding: 20px;" class="table-card">
+    <div class="skeleton" style="width: 40%; margin-bottom: 20px;"></div>
+    <div class="skeleton" style="height: 50px; margin-bottom: 10px;"></div>
+    <div class="skeleton" style="height: 50px; margin-bottom: 10px;"></div>
+    <div class="skeleton" style="height: 50px;"></div>
+</div>
+
+<script>
+let selectedTahun = null;
+let selectedDesaId = null;
+let currentStatus = '';
+
+function clearActive(selector){
+    document.querySelectorAll(selector).forEach(el=>el.classList.remove('active'));
+}
+
+function selectYear(tahun){
+    selectedTahun = tahun;
+    clearActive('[data-tahun]');
+    const target = document.querySelector(`[data-tahun="${tahun}"]`);
+    if(target) target.classList.add('active');
+
+    document.getElementById('yearSelection').style.display='none';
+    document.getElementById('desaSelection').style.display='grid';
+    document.getElementById('backButton').style.display='block';
+}
+
+function selectDesa(id, name){
+    selectedDesaId = id;
+    clearActive('[data-desa]');
+    const target = document.querySelector(`[data-desa="${id}"]`);
+    if(target) target.classList.add('active');
+
+    document.getElementById('selectedYear').innerText = selectedTahun;
+    document.getElementById('selectedDesa').innerText = name;
+    loadData();
+}
+
+function filterByStatus(btn, status){
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active-status'));
+    btn.classList.add('active-status');
+    currentStatus = status;
+    loadData();
+}
+
+function searchTable() {
+    let input = document.getElementById("tableSearch").value.toUpperCase();
+    let rows = document.querySelectorAll("#dataTable table tbody tr");
+    rows.forEach(row => {
+        let text = row.innerText.toUpperCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    });
+}
+
+function loadData(){
+    document.getElementById('loadingIndicator').style.display='block';
+    document.getElementById('dataContainer').style.display='none';
+    document.getElementById('desaSelection').style.display='none';
+
+    fetch("{% url 'bltdd_filter_api' %}?tahun="+selectedTahun+"&desa_id="+selectedDesaId+"&status="+currentStatus)
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById('loadingIndicator').style.display='none';
+        renderTable(data.data);
+        document.getElementById('dataContainer').style.display='block';
+    });
+}
+
+function renderTable(data){
+    if(data.length === 0){
+        document.getElementById('dataTable').innerHTML = `
+            <div style="padding:4rem 2rem; text-align:center; color:#94a3b8;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.2; margin-bottom:20px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <p style="font-weight:600; font-size:16px;">Tidak ada realisasi dana desa.</p>
+            </div>`;
+        return;
+    }
+    let html = `
+    <table class="table">
+    <thead>
+        <tr>
+            <th width="60">No</th>
+            <th>Nama Desa</th>
+            <th>Target Penerima</th>
+            <th>Total Dana Realisasi</th>
+            <th>Status Verifikasi</th>
+            <th style="text-align:center">Aksi</th>
+        </tr>
+    </thead>
+    <tbody>`;
+
+    data.forEach((d, i)=>{
+        html+=`
+        <tr class="status-${d.status}">
+            <td style="color:#94a3b8; font-weight:700;">${i+1}</td>
+            <td><div style="font-weight:800; color:#1e293b;">${d.desa_nama}</div><div style="font-size:11px; color:#64748b;">BLTDD — TA ${selectedTahun}</div></td>
+            <td><span style="font-weight:700; color:#475569;">${d.jumlah_kpm} KPM</span></td>
+            <td><span style="font-weight:800; color:var(--ekbang-primary);">Rp ${parseInt(d.jumlah_total_terima).toLocaleString('id-ID')}</span></td>
+            <td><span class="badge badge-${d.status}">${d.status}</span></td>
+            <td style="text-align:center">
+                <a href="/bltdd/kecamatan/${d.pk}/" class="btn-action" title="Lihat Detail Realisasi">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </a>
+            </td>
+        </tr>`;
+    });
+
+    html+="</tbody></table>";
+    document.getElementById('dataTable').innerHTML = html;
+}
+
+function resetFilter(){
+    selectedTahun = null;
+    selectedDesaId = null;
+    currentStatus = '';
+    document.getElementById('yearSelection').style.display='block';
+    document.getElementById('desaSelection').style.display='none';
+    document.getElementById('dataContainer').style.display='none';
+    document.getElementById('backButton').style.display='none';
+    clearActive('[data-tahun]');
+    clearActive('[data-desa]');
+    document.getElementById('tableSearch').value = '';
+}
+</script>
+{% endblock %}

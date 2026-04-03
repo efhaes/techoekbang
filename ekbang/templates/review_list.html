@@ -1,0 +1,382 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Review Permohonan{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h4>Review Permohonan</h4>
+    <p>Semua permohonan yang masuk dari seluruh desa</p>
+  </div>
+  <select class="form-select form-select-sm" style="width:auto;"
+    onchange="window.location.href='?tahun=' + this.value">
+    {% for t in tahun_list %}
+    <option value="{{ t }}" {% if t == tahun %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<!-- ── Stat Cards ── -->
+<div class="row g-3 mb-4">
+  <div class="col">
+    <div class="stat-card">
+      <div class="stat-icon">🏪</div>
+      <div class="stat-label">BUMDes</div>
+      <div class="stat-value">{{ bumdes_list|length }}</div>
+      <div class="stat-sub warning"><i class="bi bi-clock"></i> Menunggu review</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-label">BLT Dana Desa</div>
+      <div class="stat-value">{{ bltdd_list|length }}</div>
+      <div class="stat-sub warning"><i class="bi bi-clock"></i> Menunggu review</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="stat-card">
+      <div class="stat-icon">🏗</div>
+      <div class="stat-label">Infrastruktur</div>
+      <div class="stat-value">{{ infrastruktur_list|length }}</div>
+      <div class="stat-sub warning"><i class="bi bi-clock"></i> Menunggu review</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="stat-card">
+      <div class="stat-icon">🤝</div>
+      <div class="stat-label">Koperasi</div>
+      <div class="stat-value">{{ koperasi_list|length }}</div>
+      <div class="stat-sub warning"><i class="bi bi-clock"></i> Menunggu review</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="stat-card">
+      <div class="stat-icon">🌾</div>
+      <div class="stat-label">Ketahanan Pangan</div>
+      <div class="stat-value">{{ ketahanan_list|length }}</div>
+      <div class="stat-sub warning"><i class="bi bi-clock"></i> Menunggu review</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BUMDes ── -->
+{% if bumdes_list %}
+<div class="table-card mb-4">
+  <div class="table-card-header">
+    <div class="table-card-title">🏪 BUMDes</div>
+    <a href="{% url 'bumdes_list_kecamatan' %}?status=diajukan&tahun={{ tahun }}" class="btn btn-sm btn-outline-primary">
+      Lihat Semua
+    </a>
+  </div>
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>Desa</th>
+        <th>Nama BUMDes</th>
+        <th>Direktur</th>
+        <th>Tanggal Diajukan</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in bumdes_list %}
+      <tr>
+        <td><b>{{ obj.desa.nama }}</b></td>
+        <td>{{ obj.nama_bumdes }}</td>
+        <td>{{ obj.direktur|default:"-" }}</td>
+        <td>{{ obj.tanggal_diajukan|date:"d M Y H:i" }}</td>
+        <td>
+          <a href="{% url 'bumdes_detail_kecamatan' obj.pk %}" class="btn-action" title="Detail">
+            <i class="bi bi-eye"></i>
+          </a>
+          <form method="POST" action="{% url 'bumdes_acc' obj.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-action" title="Setujui"
+              onclick="return confirm('Setujui BUMDes ini?')">
+              <i class="bi bi-check-lg"></i>
+            </button>
+          </form>
+          <button class="btn-action danger" title="Tolak"
+            data-bs-toggle="modal" data-bs-target="#modalTolak"
+            data-pk="{{ obj.pk }}"
+            data-nama="{{ obj.nama_bumdes }} — {{ obj.desa.nama }}"
+            data-url="/bumdes/kecamatan/{{ obj.pk }}/tolak/">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── BLT Dana Desa ── -->
+{% if bltdd_list %}
+<div class="table-card mb-4">
+  <div class="table-card-header">
+    <div class="table-card-title">💰 BLT Dana Desa</div>
+    <a href="{% url 'bltdd_list_kecamatan' %}?status=diajukan&tahun={{ tahun }}" class="btn btn-sm btn-outline-primary">
+      Lihat Semua
+    </a>
+  </div>
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>Desa</th>
+        <th>Nomor SK</th>
+        <th>Jumlah KPM</th>
+        <th>Total</th>
+        <th>Tanggal Diajukan</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in bltdd_list %}
+      <tr>
+        <td><b>{{ obj.desa.nama }}</b></td>
+        <td>{{ obj.nomor_sk }}</td>
+        <td>{{ obj.jumlah_kpm }} KPM</td>
+        <td>Rp {{ obj.jumlah_total|floatformat:0 }}</td>
+        <td>{{ obj.tanggal_diajukan|date:"d M Y H:i" }}</td>
+        <td>
+          <a href="{% url 'bltdd_detail_kecamatan' obj.pk %}" class="btn-action" title="Detail">
+            <i class="bi bi-eye"></i>
+          </a>
+          <form method="POST" action="{% url 'bltdd_acc' obj.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-action" title="Setujui"
+              onclick="return confirm('Setujui BLT-DD ini?')">
+              <i class="bi bi-check-lg"></i>
+            </button>
+          </form>
+          <button class="btn-action danger" title="Tolak"
+            data-bs-toggle="modal" data-bs-target="#modalTolak"
+            data-pk="{{ obj.pk }}"
+            data-nama="BLT-DD {{ obj.desa.nama }}"
+            data-url="/bltdd/kecamatan/{{ obj.pk }}/tolak/">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Infrastruktur ── -->
+{% if infrastruktur_list %}
+<div class="table-card mb-4">
+  <div class="table-card-header">
+    <div class="table-card-title">🏗 Infrastruktur</div>
+    <a href="{% url 'infrastruktur_list_kecamatan' %}?status=diajukan&tahun={{ tahun }}" class="btn btn-sm btn-outline-primary">
+      Lihat Semua
+    </a>
+  </div>
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>Desa</th>
+        <th>Anggaran</th>
+        <th>Sumber</th>
+        <th>Ketua TPK</th>
+        <th>Tanggal Diajukan</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in infrastruktur_list %}
+      <tr>
+        <td><b>{{ obj.desa.nama }}</b></td>
+        <td>Rp {{ obj.anggaran|floatformat:0 }}</td>
+        <td>{{ obj.get_sumber_anggaran_display }}</td>
+        <td>{{ obj.ketua_tpk|default:"-" }}</td>
+        <td>{{ obj.tanggal_diajukan|date:"d M Y H:i" }}</td>
+        <td>
+          <a href="{% url 'infrastruktur_detail_kecamatan' obj.pk %}" class="btn-action" title="Detail">
+            <i class="bi bi-eye"></i>
+          </a>
+          <form method="POST" action="{% url 'infrastruktur_acc' obj.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-action" title="Setujui"
+              onclick="return confirm('Setujui infrastruktur ini?')">
+              <i class="bi bi-check-lg"></i>
+            </button>
+          </form>
+          <button class="btn-action danger" title="Tolak"
+            data-bs-toggle="modal" data-bs-target="#modalTolak"
+            data-pk="{{ obj.pk }}"
+            data-nama="Infrastruktur {{ obj.desa.nama }}"
+            data-url="/infrastruktur/kecamatan/{{ obj.pk }}/tolak/">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Koperasi ── -->
+{% if koperasi_list %}
+<div class="table-card mb-4">
+  <div class="table-card-header">
+    <div class="table-card-title">🤝 Koperasi</div>
+    <a href="{% url 'koperasi_list_kecamatan' %}?status=diajukan&tahun={{ tahun }}" class="btn btn-sm btn-outline-primary">
+      Lihat Semua
+    </a>
+  </div>
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>Desa</th>
+        <th>Nama Koperasi</th>
+        <th>Ketua</th>
+        <th>Tanggal Musyawarah</th>
+        <th>Tanggal Diajukan</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in koperasi_list %}
+      <tr>
+        <td><b>{{ obj.desa.nama }}</b></td>
+        <td>{{ obj.nama_koperasi }}</td>
+        <td>{{ obj.ketua|default:"-" }}</td>
+        <td>{{ obj.tanggal_musyawarah|date:"d M Y"|default:"-" }}</td>
+        <td>{{ obj.tanggal_diajukan|date:"d M Y H:i" }}</td>
+        <td>
+          <a href="{% url 'koperasi_detail_kecamatan' obj.pk %}" class="btn-action" title="Detail">
+            <i class="bi bi-eye"></i>
+          </a>
+          <form method="POST" action="{% url 'koperasi_acc' obj.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-action" title="Setujui"
+              onclick="return confirm('Setujui koperasi ini?')">
+              <i class="bi bi-check-lg"></i>
+            </button>
+          </form>
+          <button class="btn-action danger" title="Tolak"
+            data-bs-toggle="modal" data-bs-target="#modalTolak"
+            data-pk="{{ obj.pk }}"
+            data-nama="{{ obj.nama_koperasi }} — {{ obj.desa.nama }}"
+            data-url="/koperasi/kecamatan/{{ obj.pk }}/tolak/">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Ketahanan Pangan ── -->
+{% if ketahanan_list %}
+<div class="table-card mb-4">
+  <div class="table-card-header">
+    <div class="table-card-title">🌾 Ketahanan Pangan</div>
+    <a href="{% url 'ketahanan_pangan_list_kecamatan' %}?status=diajukan&tahun={{ tahun }}" class="btn btn-sm btn-outline-primary">
+      Lihat Semua
+    </a>
+  </div>
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>Desa</th>
+        <th>Nama Kelompok</th>
+        <th>Ketua</th>
+        <th>Jenis Usaha</th>
+        <th>Tanggal Diajukan</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in ketahanan_list %}
+      <tr>
+        <td><b>{{ obj.desa.nama }}</b></td>
+        <td>{{ obj.nama_kelompok }}</td>
+        <td>{{ obj.ketua|default:"-" }}</td>
+        <td>
+          {% if obj.usaha_pertanian %}<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle me-1">Pertanian</span>{% endif %}
+          {% if obj.usaha_peternakan %}<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle me-1">Peternakan</span>{% endif %}
+          {% if obj.usaha_perladangan %}<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle me-1">Perladangan</span>{% endif %}
+          {% if obj.usaha_perdagangan %}<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle me-1">Perdagangan</span>{% endif %}
+          {% if obj.usaha_perikanan %}<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle me-1">Perikanan</span>{% endif %}
+        </td>
+        <td>{{ obj.tanggal_diajukan|date:"d M Y H:i" }}</td>
+        <td>
+          <a href="{% url 'ketahanan_pangan_detail_kecamatan' obj.pk %}" class="btn-action" title="Detail">
+            <i class="bi bi-eye"></i>
+          </a>
+          <form method="POST" action="{% url 'ketahanan_pangan_acc' obj.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-action" title="Setujui"
+              onclick="return confirm('Setujui ketahanan pangan ini?')">
+              <i class="bi bi-check-lg"></i>
+            </button>
+          </form>
+          <button class="btn-action danger" title="Tolak"
+            data-bs-toggle="modal" data-bs-target="#modalTolak"
+            data-pk="{{ obj.pk }}"
+            data-nama="{{ obj.nama_kelompok }} — {{ obj.desa.nama }}"
+            data-url="/ketahanan-pangan/kecamatan/{{ obj.pk }}/tolak/">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if not bumdes_list and not bltdd_list and not infrastruktur_list and not koperasi_list and not ketahanan_list %}
+<div class="table-card">
+  <div class="text-center py-5">
+    <div style="font-size:56px;">✅</div>
+    <h6 class="mt-3 fw-bold">Semua permohonan sudah diproses</h6>
+    <p class="text-muted small">Tidak ada permohonan yang menunggu review untuk tahun {{ tahun }}</p>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Modal Tolak ── -->
+<div class="modal fade" id="modalTolak" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius:14px;">
+      <div class="modal-header border-0">
+        <h6 class="modal-title fw-bold">Tolak Permohonan</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" id="formTolak">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p class="text-muted small mb-3">Data: <strong id="modalNama"></strong></p>
+          <label class="form-label">Alasan Penolakan <span class="text-danger">*</span></label>
+          <textarea name="catatan_verifikasi" class="form-control" rows="4"
+            placeholder="Tuliskan alasan penolakan secara jelas..." required></textarea>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-x-lg me-1"></i> Tolak
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('modalTolak').addEventListener('show.bs.modal', function (e) {
+    const btn = e.relatedTarget;
+    document.getElementById('formTolak').action = btn.getAttribute('data-url');
+    document.getElementById('modalNama').textContent = btn.getAttribute('data-nama');
+  });
+</script>
+{% endblock %}

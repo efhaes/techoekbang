@@ -1,0 +1,67 @@
+/* ===== FORM CARD ===== */
+.form-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+  border: 1px solid #ede9fe;
+
+  box-shadow: 0 4px 14px rgba(124,58,237,0.06);
+  transition: all 0.2s ease;
+}
+
+.form-card:hover {
+  box-shadow: 0 10px 30px rgba(124,58,237,0.12);
+  transform: translateY(-2px);
+}
+
+/* ===== TITLE ===== */
+.form-section-title {
+  font-weight: 600;
+  margin-bottom: 14px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-section-title i {
+  color: #7c3aed;
+}
+
+/* ===== INPUT ===== */
+input, select {
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+input:focus, select:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1) !important;
+}
+
+/* ===== LABEL ===== */
+label {
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #475569;
+}
+
+/* ===== BUTTON ===== */
+.btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #6d28d9, #5b21b6);
+}
+
+.form-action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}

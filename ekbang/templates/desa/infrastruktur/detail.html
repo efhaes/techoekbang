@@ -1,0 +1,329 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Detail Infrastruktur{% endblock %}
+{% block extra_css %}
+<style>
+    :root {
+        /* Tema Warna Infrastruktur: Sky Blue */
+        --primary: #0ea5e9; 
+        --primary-dark: #0284c7;
+        --primary-light: #f0f9ff;
+        --bg-light: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-section-title {
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+    }
+
+    .form-section-title i { color: var(--primary); }
+
+    .detail-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+    }
+
+    .detail-value {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 1rem;
+    }
+
+    /* Tabel Detail Pekerjaan */
+    .table-custom { font-size: 0.9rem; }
+    .table-custom thead { background-color: var(--primary-light); color: var(--primary-dark); }
+
+    /* Foto Box */
+    .foto-container {
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px;
+        transition: all 0.3s;
+        background: #fff;
+    }
+    .foto-container:hover { border-color: var(--primary); transform: translateY(-3px); }
+
+    /* Dokumen Link */
+    .doc-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--bg-light);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-dark);
+        transition: all 0.2s;
+    }
+    .doc-link:hover {
+        background: #fff;
+        border-color: var(--primary);
+        color: var(--primary);
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+    }
+
+    /* History Timeline */
+    .history-item {
+        border-left: 2px solid var(--border-color);
+        padding-left: 1.5rem;
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    .history-item::before {
+        content: '';
+        position: absolute;
+        left: -7px;
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border: 2px solid var(--primary);
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    /* Footer Bar */
+    .action-container {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .btn-primary { background-color: var(--primary) !important; border-color: var(--primary) !important; }
+    .btn-outline-primary { color: var(--primary) !important; border-color: var(--primary) !important; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="mb-1 fw-bold">Detail Infrastruktur</h4>
+        <p class="text-muted mb-0"><i class="bi bi-geo-alt me-1"></i> Desa {{ infra.desa.nama }} — TA {{ infra.tahun_anggaran }}</p>
+    </div>
+    <span class="badge badge-{{ infra.status }} px-3 py-2" style="font-size:13px; border-radius: 50px;">
+        {% if infra.status == 'draft' %}📝
+        {% elif infra.status == 'diajukan' %}⏳
+        {% elif infra.status == 'disetujui' %}✅
+        {% else %}❌{% endif %}
+        {{ infra.get_status_display }}
+    </span>
+</div>
+
+{% if infra.status == 'ditolak' and infra.catatan_verifikasi %}
+<div class="alert-tolak mb-4 shadow-sm">
+    <i class="bi bi-exclamation-octagon-fill me-2"></i>
+    <strong>Alasan Penolakan:</strong> {{ infra.catatan_verifikasi }}
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8">
+        
+        <div class="form-card" style="border-top: 4px solid var(--primary);">
+            <div class="form-section-title">
+                <i class="bi bi-file-earmark-text-fill"></i> Ringkasan Kegiatan
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-12 mb-2">
+                    <div class="detail-label">Nama Kegiatan</div>
+                    <div class="detail-value text-primary" style="font-size: 1.4rem; line-height: 1.2;">
+                        {{ infra.kegiatan }}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="p-3 rounded-4" style="background: var(--primary-light); border: 1px dashed var(--primary);">
+                        <div class="detail-label" style="color: var(--primary-dark);">Total Anggaran (Pagu)</div>
+                        <div class="detail-value" style="font-size: 1.8rem; color: var(--text-dark);">
+                            <span style="font-size: 1rem; color: var(--primary-dark);">Rp</span> 
+                            {{ infra.anggaran|floatformat:0 }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="detail-label">Sumber Dana</div>
+                            <div class="detail-value">
+                                <span class="badge bg-white text-info border-info border px-2 py-1" style="color: var(--primary-dark) !important; font-size: 11px;">
+                                    {{ infra.get_sumber_anggaran_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-label">Tahun Anggaran</div>
+                            <div class="detail-value">{{ infra.tahun_anggaran }}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-label">Ketua TPK</div>
+                            <div class="detail-value text-muted" style="font-size: 0.9rem;">
+                                <i class="bi bi-person-badge me-1"></i> {{ infra.ketua_tpk|default:"-" }}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detail-label">Nomor SK</div>
+                            <div class="detail-value text-muted" style="font-size: 0.85rem;">
+                                {{ infra.nomor_sk|default:"-" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-title"><i class="bi bi-tools"></i> Detail Pekerjaan</div>
+            {% if infra.details.all %}
+            <div class="table-responsive">
+                <table class="table table-hover table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Jenis</th>
+                            <th>Lokasi</th>
+                            <th>Volume</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detail in infra.details.all %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="fw-bold">{{ detail.get_jenis_display }}</td>
+                            <td>{{ detail.lokasi }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ detail.volume }}</span></td>
+                            <td class="text-muted">{{ detail.keterangan_lainnya|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4 text-muted small italic">Belum ada detail pekerjaan.</div>
+            {% endif %}
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-title"><i class="bi bi-images"></i> Foto Kegiatan</div>
+            {% if infra.fotos.all %}
+            <div class="row g-3">
+                {% for foto in infra.fotos.all %}
+                <div class="col-md-4">
+                    <div class="foto-container text-center">
+                        <img src="{{ foto.foto.url }}" class="img-fluid rounded mb-2 shadow-sm" style="height:150px; width:100%; object-fit:cover;">
+                        <div class="detail-label" style="font-size: 10px;">Tahap Penyaluran</div>
+                        <div class="small fw-bold text-primary">{{ foto.get_tahap_display }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-3 text-muted small italic">Belum ada foto yang diunggah.</div>
+            {% endif %}
+        </div>
+    </div> <div class="col-lg-4">
+        <div class="sticky-top" style="top: 20px;">
+            <div class="form-card">
+                <div class="form-section-title"><i class="bi bi-paperclip"></i> Dokumen Lampiran</div>
+                <div class="d-grid gap-2">
+                    {% if infra.file_sk %}
+                    <a href="{{ infra.file_sk.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-file-pdf doc-icon"></i> <span class="small fw-bold">File SK</span>
+                    </a>
+                    {% endif %}
+                    {% if infra.file_sk_tpk %}
+                    <a href="{{ infra.file_sk_tpk.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-people doc-icon"></i> <span class="small fw-bold">SK TPK</span>
+                    </a>
+                    {% endif %}
+                    {% if infra.file_rab %}
+                    <a href="{{ infra.file_rab.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-calculator doc-icon"></i> <span class="small fw-bold">File RAB</span>
+                    </a>
+                    {% endif %}
+                    {% if infra.file_lpj %}
+                    <a href="{{ infra.file_lpj.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-check-all doc-icon"></i> <span class="small fw-bold">File LPJ</span>
+                    </a>
+                    {% endif %}
+                    {% if not infra.file_sk and not infra.file_rab %}
+                    <p class="text-center text-muted small py-2">Tidak ada dokumen.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-section-title"><i class="bi bi-clock-history"></i> Log Aktivitas</div>
+                <div class="history-item">
+                    <div class="detail-label">Status Penginputan</div>
+                    <div class="detail-value" style="font-size: 0.9rem;">
+                        {% if infra.diajukan_oleh %}
+                            {{ infra.diajukan_oleh.get_full_name|default:infra.diajukan_oleh.username }}
+                        {% else %}-{% endif %}
+                    </div>
+                    <div class="text-muted small" style="font-size: 11px;">
+                        {{ infra.tanggal_diajukan|date:"d M Y, H:i"|default:"Draft" }}
+                    </div>
+                </div>
+                
+                {% if infra.tanggal_verifikasi %}
+                <div class="history-item" style="padding-bottom: 0;">
+                    <div class="detail-label">Verifikasi Kecamatan</div>
+                    <div class="detail-value" style="font-size: 0.9rem;">Admin Kecamatan</div>
+                    <div class="text-muted small" style="font-size: 11px;">
+                        {{ infra.tanggal_verifikasi|date:"d M Y, H:i" }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div> </div> <div class="action-container shadow-sm border-0">
+    <a href="{% url 'infrastruktur_list' %}" class="btn btn-light border px-4">
+        <i class="bi bi-arrow-left me-2"></i>Kembali
+    </a>
+    <div class="d-flex gap-2">
+        {% if infra.status == 'draft' or infra.status == 'ditolak' %}
+        <a href="{% url 'infrastruktur_edit' infra.pk %}" class="btn btn-outline-primary px-4">
+            <i class="bi bi-pencil-square me-2"></i>Edit Data
+        </a>
+        <form method="POST" action="{% url 'infrastruktur_submit' infra.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary px-4" onclick="return confirm('Ajukan data ini ke kecamatan?')">
+                <i class="bi bi-send-fill me-2"></i>Ajukan Sekarang
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

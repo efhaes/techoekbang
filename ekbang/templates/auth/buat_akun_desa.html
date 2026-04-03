@@ -1,0 +1,45 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Buat Akun Admin Desa</h5>
+        </div>
+        <div class="card-body">
+
+          {% if messages %}
+            {% for msg in messages %}
+              <div class="alert alert-success py-2">{{ msg }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Pilih Desa</label>
+              {{ form.desa }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Username</label>
+              {{ form.username }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Password</label>
+              {{ form.password }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Konfirmasi Password</label>
+              {{ form.konfirmasi_password }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Buat Akun</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

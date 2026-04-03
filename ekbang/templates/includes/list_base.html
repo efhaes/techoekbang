@@ -1,0 +1,55 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/desa/list_style.css' %}">
+  
+  {% block list_extra_css %}{% endblock %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h4>{% block list_title %}{% endblock %}</h4>
+        <p>Desa {{ desa.nama }}</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <select class="form-select form-select-sm" onchange="window.location.href='?tahun=' + this.value">
+            {% for t in tahun_list %}
+            <option value="{{ t }}" {% if t == tahun %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+        {% block add_button %}{% endblock %}
+    </div>
+</div>
+
+{% if object_list %}
+    {% for obj in object_list %}
+    <div class="table-card mb-3 status-{{ obj.status }}">
+        <div class="table-card-header d-flex justify-content-between align-items-start">
+            <div>
+                <div class="table-card-title">{% block item_title %}{% endblock %}</div>
+                <div class="text-muted" style="font-size:12px;">{% block item_subtitle %}{% endblock %}</div>
+            </div>
+            <span class="badge badge-{{ obj.status }}">
+                {% block item_status_icon %}{% endblock %} {{ obj.get_status_display }}
+            </span>
+        </div>
+
+        {% if obj.status == 'ditolak' and obj.catatan_verifikasi %}
+        <div class="alert-tolak"><strong>Alasan Penolakan:</strong> {{ obj.catatan_verifikasi }}</div>
+        {% endif %}
+
+        <div class="px-3 pt-3">{% block item_body %}{% endblock %}</div>
+
+        <div class="p-3">{% block item_actions %}{% endblock %}</div>
+    </div>
+    {% endfor %}
+{% else %}
+    {% block empty_state %}{% endblock %}
+{% endif %}
+
+{% include 'includes/modal_hapus.html' %}
+{% endblock %}

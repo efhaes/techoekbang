@@ -1,0 +1,350 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #0ea5e9; /* Sky Blue - Sesuai menu-infra */
+        --primary-hover: #0284c7;
+        --secondary-bg: #f8fafc;
+        --border-color: #e2e8f0;
+    }
+
+    /* Header Form */
+    .page-header {
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    .page-header::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: var(--primary-color);
+    }
+
+    /* Card Styling */
+    .form-card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+    }
+    .form-section-title i { color: var(--primary-color); }
+
+    /* Input Styling */
+    label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.4rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1.5px solid var(--border-color);
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        outline: none;
+    }
+
+    /* Formset Items */
+    .detail-item, .foto-item {
+        background: var(--secondary-bg);
+        border: 1px solid var(--border-color) !important;
+        transition: all 0.2s;
+    }
+    .detail-item:hover, .foto-item:hover {
+        border-color: var(--primary-color) !important;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: var(--primary-color) !important;
+        border: none !important;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    .btn-primary:hover { background: var(--primary-hover) !important; }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .btn-outline-primary:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    /* Help Text */
+    .form-text { font-size: 0.75rem; color: #94a3b8; }
+
+    /* Bikin inputan lebih tinggi dan teks lebih besar agar mudah diklik/dibaca */
+    .form-control, .form-select {
+        height: 45px;
+        font-size: 16px; /* Standar mobile/usia senja agar tidak kekecilan */
+    }
+
+    /* Efek hover agar tahu kalau item ini bisa diisi */
+    .detail-item:hover {
+        border-color: #0ea5e9 !important;
+        background-color: #f0f9ff;
+    }
+
+    /* Kasih jarak antar label dan input */
+    label {
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Bikin tombol Tambah lebih mencolok */
+    .btn-primary {
+        padding: 8px 20px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-style: italic;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'infrastruktur_list' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="mb-0 fw-bold">{{ title }}</h4>
+            <p class="text-muted mb-0 small">Input data pembangunan fisik desa</p>
+        </div>
+    </div>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-card">
+        <div class="form-section-title">
+            <i class="bi bi-info-circle-fill"></i> Informasi Utama
+        </div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label>Tahun Anggaran</label>
+                {{ form.tahun_anggaran }}
+            </div>
+            <div class="col-md-9">
+                <label>Nama Kegiatan / Judul Proyek</label>
+                {{ form.kegiatan }}
+            </div>
+            <div class="col-md-4">
+                <label>Total Anggaran (Rp)</label>
+                {{ form.anggaran }}
+            </div>
+            <div class="col-md-4">
+                <label>Sumber Dana</label>
+                {{ form.sumber_anggaran }}
+            </div>
+            <div class="col-md-4">
+                <label>Nomor SK Penetapan</label>
+                {{ form.nomor_sk }}
+            </div>
+            <div class="col-md-6">
+                <label>Ketua TPK (Pelaksana)</label>
+                {{ form.ketua_tpk }}
+            </div>
+             <div class="col-md-6">
+                <label>Upload File SK</label>
+                {{ form.file_sk }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-card">
+    <div class="form-section-title justify-content-between d-flex">
+        <span><i class="bi bi-stack"></i> Rincian Lokasi & Item Pekerjaan</span>
+        <button type="button" class="btn btn-sm btn-primary" onclick="addForm()">
+            <i class="bi bi-plus-circle me-1"></i> + Tambah Lokasi/Item Baru
+        </button>
+    </div>
+    
+    <p class="text-muted small mb-3">
+        <i class="bi bi-info-circle"></i> Jika dalam satu anggaran terdapat lebih dari satu tempat/jenis bangunan, klik tombol <strong>Tambah Item</strong> di atas.
+    </p>
+
+    {{ formset.management_form }}
+    <div id="formset-container">
+        {% for form_detail in formset %}
+        <div class="detail-item border rounded mb-4 shadow-sm" style="border-left: 5px solid #0ea5e9 !important;">
+            <div class="p-2 bg-light border-bottom d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark small"><i class="bi bi-geo-alt-fill me-1"></i> Item Pekerjaan</span>
+                {% if formset.can_delete %}
+                <div class="form-check text-danger mb-0">
+                    {{ form_detail.DELETE }} <label class="small fw-bold cursor-pointer">Hapus Item Ini</label>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="p-3 bg-white">
+                {{ form_detail.id }}
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="fw-bold text-dark">1. Jenis Pekerjaan</label>
+                        {{ form_detail.jenis }}
+                        <div class="form-text">Pilih jenis bangunan/fisik.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="fw-bold text-dark">2. Lokasi Spesifik</label>
+                        {{ form_detail.lokasi }}
+                        <div class="form-text">Sebutkan nama dusun/RT/RW.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="fw-bold text-dark">3. Volume / Ukuran</label>
+                        {{ form_detail.volume }}
+                        <div class="form-text">Contoh: 200m x 3m atau 1 Unit.</div>
+                    </div>
+                    
+                    <div class="col-md-12 mt-3">
+                        <label class="fw-bold text-dark">Keterangan Tambahan (Opsional)</label>
+                        {{ form_detail.keterangan_lainnya }}
+                        <div class="form-text">Tambahkan catatan jika diperlukan.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="form-card">
+        <div class="form-section-title justify-content-between d-flex">
+            <span><i class="bi bi-camera-fill"></i> Foto Dokumentasi Progress</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addFotoForm()">
+                <i class="bi bi-plus-circle me-1"></i> Tambah Foto
+            </button>
+        </div>
+        
+        <p class="text-muted small mb-3">
+            <i class="bi bi-info-circle"></i> Unggah foto kondisi 0%, 50%, dan 100%. Klik tombol <strong>Tambah Foto</strong> jika ingin mengunggah lebih dari satu.
+        </p>
+
+        {{ formset_foto.management_form }}
+        <div id="foto-container">
+            {% for foto_form in formset_foto %}
+            <div class="foto-item border rounded mb-3 p-3 bg-white shadow-sm" style="border-left: 5px solid #10b981 !important;">
+                {{ foto_form.id }}
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-3">
+                        <label class="fw-bold text-dark">Tahap Progress</label>
+                        {{ foto_form.tahap }}
+                    </div>
+                    <div class="col-md-5">
+                        <label class="fw-bold text-dark">Pilih Foto</label>
+                        {{ foto_form.foto }}
+                    </div>
+                    <div class="col-md-2 text-center">
+                        {% if foto_form.instance.foto %}
+                            <img src="{{ foto_form.instance.foto.url }}" class="img-thumbnail" style="height: 80px;">
+                        {% else %}
+                            <div class="text-muted small italic">Belum ada foto</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2 text-end">
+                        {% if formset_foto.can_delete %}
+                            <div class="form-check text-danger">
+                                {{ foto_form.DELETE }} <label class="small fw-bold">Hapus</label>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="form-card">
+        <div class="form-section-title">
+            <i class="bi bi-cloud-arrow-up-fill"></i> Lampiran Dokumen (PDF/Scan)
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <label><i class="bi bi-file-pdf"></i> Dokumen RAB</label>
+                {{ form.file_rab }}
+            </div>
+            <div class="col-md-4">
+                <label><i class="bi bi-file-pdf"></i> Dokumen LPJ</label>
+                {{ form.file_lpj }}
+            </div>
+            <div class="col-md-4">
+                <label><i class="bi bi-file-pdf"></i> SK TPK</label>
+                {{ form.file_sk_tpk }}
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-5">
+        <p class="text-muted small mb-0"><i class="bi bi-info-circle"></i> Pastikan semua file yang diupload dalam format PDF/JPG.</p>
+        <div class="d-flex gap-2">
+            <a href="{% url 'infrastruktur_list' %}" class="btn btn-light px-4">Batal</a>
+            <button type="submit" class="btn btn-primary px-5 shadow">
+                <i class="bi bi-save me-2"></i> Simpan Data Infrastruktur
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>
+function addFotoForm() {
+    const container = document.getElementById('foto-container');
+    const totalForms = document.getElementById('id_fotos-TOTAL_FORMS'); // Sesuaikan prefix jika beda
+    const currentCount = parseInt(totalForms.value);
+
+    // Ambil baris pertama sebagai template
+    const newForm = container.children[0].cloneNode(true);
+
+    // Update index (Misal fotos-0-tahap jadi fotos-1-tahap)
+    newForm.innerHTML = newForm.innerHTML.replace(/fotos-\d+/g, `fotos-${currentCount}`);
+
+    // Bersihkan nilai input & hapus preview foto lama di baris baru
+    newForm.querySelectorAll('input, select').forEach(el => {
+        el.value = '';
+        if(el.type === 'checkbox') el.checked = false;
+    });
+    
+    const oldImg = newForm.querySelector('img');
+    if(oldImg) oldImg.remove();
+
+    container.appendChild(newForm);
+    totalForms.value = currentCount + 1;
+}
+</script>
+{% endblock %}

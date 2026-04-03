@@ -1,0 +1,235 @@
+/* Kecamatan Filter Cards Styling - Override Base CSS */
+#content-wrapper .filter-card-container {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1rem !important;
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+}
+
+@media (max-width: 992px) {
+  #content-wrapper .filter-card-container {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #content-wrapper .filter-card-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #content-wrapper .filter-card-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+}
+
+#content-wrapper .card-year, #content-wrapper .card-desa {
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  position: relative !important;
+  overflow: hidden !important;
+  height: 120px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+
+#content-wrapper .card-year:hover, #content-wrapper .card-desa:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+  border-color: #0d6efd !important;
+  background: linear-gradient(135deg, #f8f9ff 0%, #e7f3ff 100%) !important;
+}
+
+#content-wrapper .card-year.active, #content-wrapper .card-desa.active {
+  border-color: #0d6efd !important;
+  background: linear-gradient(135deg, #e7f3ff 0%, #cfe2ff 100%) !important;
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.25) !important;
+  transform: translateY(-2px) !important;
+}
+
+#content-wrapper .card-year.active::before, #content-wrapper .card-desa.active::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-style: solid !important;
+  border-width: 0 32px 32px 0 !important;
+  border-color: transparent #0d6efd transparent transparent !important;
+}
+
+#content-wrapper .card-year.active::after, #content-wrapper .card-desa.active::after {
+  content: '✓' !important;
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  z-index: 1 !important;
+}
+
+#content-wrapper .card-year .card-body, #content-wrapper .card-desa .card-body {
+  padding: 1.5rem !important;
+  text-align: center !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#content-wrapper .card-year .card-title, #content-wrapper .card-desa .card-title {
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin: 0 !important;
+  font-size: 1.1rem !important;
+  line-height: 1.2 !important;
+}
+
+#content-wrapper .card-year:hover .card-title, #content-wrapper .card-desa:hover .card-title {
+  color: #0d6efd !important;
+}
+
+#content-wrapper .card-year.active .card-title, #content-wrapper .card-desa.active .card-title {
+  color: #0d6efd !important;
+  font-weight: 700 !important;
+}
+
+/* Status Filter Buttons */
+#content-wrapper .status-filter-btn {
+  border-radius: 12px !important;
+  padding: 0.75rem 1.25rem !important;
+  font-weight: 500 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 2px solid transparent !important;
+  position: relative !important;
+  overflow: hidden !important;
+  font-size: 0.95rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+#content-wrapper .status-filter-btn::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent) !important;
+  transition: left 0.6s !important;
+}
+
+#content-wrapper .status-filter-btn:hover::before {
+  left: 100% !important;
+}
+
+#content-wrapper .status-filter-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+}
+
+#content-wrapper .status-filter-btn.active {
+  border-color: currentColor !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+#content-wrapper .status-filter-count {
+  background: rgba(255,255,255,0.25) !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  min-width: 24px !important;
+  text-align: center !important;
+}
+
+/* Back to Filter Button */
+#content-wrapper .btn-back-filter {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+  border: none !important;
+  color: white !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  font-size: 0.95rem !important;
+}
+
+#content-wrapper .btn-back-filter:hover {
+  background: linear-gradient(135deg, #5a6268 0%, #343a40 100%) !important;
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(108, 117, 125, 0.4) !important;
+  color: white !important;
+}
+
+#content-wrapper .btn-back-filter:active {
+  transform: translateY(-1px) !important;
+}
+
+/* Add subtle animation */
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+#content-wrapper .card-year, #content-wrapper .card-desa {
+  animation: fadeInUp 0.4s ease-out !important;
+}
+
+#content-wrapper .card-year:nth-child(1) { animation-delay: 0.05s !important; }
+#content-wrapper .card-year:nth-child(2) { animation-delay: 0.1s !important; }
+#content-wrapper .card-year:nth-child(3) { animation-delay: 0.15s !important; }
+#content-wrapper .card-year:nth-child(4) { animation-delay: 0.2s !important; }
+
+#content-wrapper .card-desa:nth-child(1) { animation-delay: 0.05s !important; }
+#content-wrapper .card-desa:nth-child(2) { animation-delay: 0.1s !important; }
+#content-wrapper .card-desa:nth-child(3) { animation-delay: 0.15s !important; }
+#content-wrapper .card-desa:nth-child(4) { animation-delay: 0.2s !important; }
+
+/* Section Headers */
+#content-wrapper #yearSelection h6, #content-wrapper #desaSelection h6 {
+  font-weight: 600 !important;
+  color: #495057 !important;
+  margin-bottom: 1.5rem !important;
+  font-size: 1.1rem !important;
+}
+
+/* Status Filters Container */
+#content-wrapper #statusFilters {
+  background: #f8f9fa !important;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  border: 1px solid #e9ecef !important;
+}
+
+/* Loading and Empty States */
+#content-wrapper #loadingIndicator, #content-wrapper #emptyState {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  border: 1px solid #e9ecef !important;
+  padding: 3rem !important;
+}

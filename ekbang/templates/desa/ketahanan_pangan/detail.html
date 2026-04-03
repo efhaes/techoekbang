@@ -1,0 +1,258 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Detail Ketahanan Pangan{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #22c55e;
+        --primary-light: #f0fdf4;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    .detail-container { max-width: 1100px; margin: 0 auto; padding-bottom: 5rem; }
+
+    /* Header Styling */
+    .header-box {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Card Styling */
+    .info-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        height: 100%;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+    .card-header-custom {
+        background: var(--primary-light);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header-custom i { color: var(--primary-color); font-size: 1.1rem; }
+    .card-header-custom h6 { margin: 0; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.85rem; }
+
+    .card-body-custom { padding: 1.25rem; }
+
+    /* Data Row Styling */
+    .data-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8fafc;
+    }
+    .data-row:last-child { border-bottom: none; }
+
+    .label-text { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
+    .value-text { color: var(--text-dark); font-size: 0.85rem; font-weight: 600; text-align: right; }
+
+    /* Badge & Status */
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    .badge-draft { background: #f1f5f9; color: #475569; }
+    .badge-diajukan { background: #fef3c7; color: #b45309; }
+    .badge-disetujui { background: #dcfce7; color: #15803d; }
+    .badge-ditolak { background: #fee2e2; color: #b91c1c; }
+
+    /* Document Link */
+    .doc-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        text-decoration: none !important;
+        transition: 0.2s;
+        border: 1px solid transparent;
+    }
+    .doc-item:hover { border-color: var(--primary-color); background: white; }
+    .doc-item i { color: var(--primary-color); margin-right: 12px; font-size: 1.2rem; }
+    .doc-item span { color: var(--text-dark); font-weight: 600; font-size: 0.85rem; }
+
+    /* Usaha Chip */
+    .usaha-chip {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    .chip-active { background: var(--primary-light); color: var(--primary-color); border: 1px solid #bbf7d0; }
+    .chip-inactive { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; text-decoration: line-through; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    
+    <div class="header-box shadow-sm">
+        <div>
+            <h4 class="mb-0 fw-bold" style="color: var(--text-dark);">{{ obj.nama_kelompok }}</h4>
+            <small class="text-muted">Desa {{ obj.desa.nama }} — ID: #KP-{{ obj.pk }}-{{ obj.tahun_anggaran }}</small>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="text-end me-2">
+                <div class="small text-muted">Status:</div>
+                <div class="fw-bold text-uppercase" style="font-size: 0.7rem;">{{ obj.get_status_display }}</div>
+            </div>
+            <span class="status-badge badge-{{ obj.status }}">
+                {% if obj.status == 'draft' %}📝{% elif obj.status == 'diajukan' %}⏳{% elif obj.status == 'disetujui' %}✅{% else %}❌{% endif %}
+                {{ obj.status|upper }}
+            </span>
+        </div>
+    </div>
+
+    {% if obj.status == 'ditolak' and obj.catatan_verifikasi %}
+    <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <b>Catatan Penolakan:</b> {{ obj.catatan_verifikasi }}
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="info-card">
+                <div class="card-header-custom">
+                    <i class="bi bi-info-circle"></i>
+                    <h6>Informasi & Legalitas</h6>
+                </div>
+                <div class="card-body-custom">
+                    <div class="data-row"><span class="label-text">Tahun Anggaran</span><span class="value-text">{{ obj.tahun_anggaran }}</span></div>
+                    <div class="data-row"><span class="label-text">Nama Ketua</span><span class="value-text">{{ obj.ketua|default:"-" }}</span></div>
+                    <div class="data-row"><span class="label-text">Nomor SK</span><span class="value-text">{{ obj.nomor_sk|default:"-" }}</span></div>
+                    <div class="data-row"><span class="label-text">Tanggal SK</span><span class="value-text">{{ obj.tanggal_sk|date:"d M Y"|default:"-" }}</span></div>
+                    <div class="data-row"><span class="label-text">Besar Anggaran</span><span class="value-text text-success">Rp {{ obj.pembiayaan_anggaran|floatformat:0 }}</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="info-card">
+                <div class="card-header-custom">
+                    <i class="bi bi-briefcase"></i>
+                    <h6>Bidang Usaha Kelompok</h6>
+                </div>
+                <div class="card-body-custom">
+                    <div class="mb-3">
+                        <span class="usaha-chip {% if obj.usaha_pertanian %}chip-active{% else %}chip-inactive{% endif %}">Pertanian</span>
+                        <span class="usaha-chip {% if obj.usaha_peternakan %}chip-active{% else %}chip-inactive{% endif %}">Peternakan</span>
+                        <span class="usaha-chip {% if obj.usaha_perladangan %}chip-active{% else %}chip-inactive{% endif %}">Perladangan</span>
+                        <span class="usaha-chip {% if obj.usaha_perdagangan %}chip-active{% else %}chip-inactive{% endif %}">Perdagangan</span>
+                        <span class="usaha-chip {% if obj.usaha_perikanan %}chip-active{% else %}chip-inactive{% endif %}">Perikanan</span>
+                    </div>
+                    {% if obj.usaha_lainnya %}
+                    <div class="p-2 rounded bg-light border-start border-3 border-success">
+                        <small class="text-muted d-block">Usaha Lainnya:</small>
+                        <span class="fw-bold small">{{ obj.usaha_lainnya }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="info-card">
+                <div class="card-header-custom">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <h6>Dokumen Pendukung</h6>
+                </div>
+                <div class="card-body-custom">
+                    {% if obj.file_sk %}
+                    <a href="{{ obj.file_sk.url }}" target="_blank" class="doc-item">
+                        <i class="bi bi-file-earmark-check"></i><span>Surat Keputusan (SK)</span>
+                    </a>
+                    {% endif %}
+                    {% if obj.proposal %}
+                    <a href="{{ obj.proposal.url }}" target="_blank" class="doc-item">
+                        <i class="bi bi-file-earmark-person"></i><span>Proposal Kegiatan</span>
+                    </a>
+                    {% endif %}
+                    {% if obj.file_lpj_ketahanan %}
+                    <a href="{{ obj.file_lpj_ketahanan.url }}" target="_blank" class="doc-item">
+                        <i class="bi bi-file-earmark-ruled"></i><span>Laporan (LPJ)</span>
+                    </a>
+                    {% endif %}
+                    {% if not obj.file_sk and not obj.proposal %}
+                    <p class="text-center text-muted small py-3">Tidak ada file lampiran.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+<div class="col-md-6">
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-clock-history"></i>
+            <h6>Jejak Audit & Riwayat</h6>
+        </div>
+        <div class="card-body-custom">
+            <div class="data-row">
+                <span class="label-text">Input Oleh</span>
+                <span class="value-text">
+                    {% if obj.diajukan_oleh %}
+                        {{ obj.diajukan_oleh.get_full_name|default:obj.diajukan_oleh.username }}
+                    {% else %}
+                        <span class="text-muted italic">-</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="data-row">
+                <span class="label-text">Tanggal Diajukan</span>
+                <span class="value-text">
+                    {{ obj.tanggal_diajukan|date:"d M Y, H:i"|default:"Belum diajukan" }}
+                </span>
+            </div>
+            <div class="data-row">
+                <span class="label-text">Verifikasi Kecamatan</span>
+                <span class="value-text">
+                    {{ obj.tanggal_verifikasi|date:"d M Y, H:i"|default:"-" }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4 p-3 bg-white border rounded-4 shadow-sm">
+        <a href="{% url 'ketahanan_pangan_list' %}" class="btn btn-light border px-4">
+            <i class="bi bi-arrow-left me-2"></i>Kembali
+        </a>
+        
+        <div class="d-flex gap-2">
+            {% if obj.status == 'draft' or obj.status == 'ditolak' %}
+            <a href="{% url 'ketahanan_pangan_edit' obj.pk %}" class="btn btn-outline-success px-4">
+                <i class="bi bi-pencil-square me-2"></i>Edit Data
+            </a>
+            
+            <form method="POST" action="{% url 'ketahanan_pangan_submit' obj.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success px-4 shadow-sm" onclick="return confirm('Kirim data ini untuk diverifikasi?')">
+                    <i class="bi bi-send-fill me-2"></i>Ajukan Sekarang
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

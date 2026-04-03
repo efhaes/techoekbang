@@ -1,0 +1,152 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/desa/bumdes/form.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h4>{{ title }}</h4>
+  <p>Isi data BUMDes dengan lengkap dan benar</p>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- IDENTITAS -->
+  <div class="form-card">
+    <div class="form-section-title">
+      <i class="bi bi-file-text"></i> Identitas BUMDes
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label>Tahun Anggaran</label>
+        {{ form.tahun_anggaran }}
+      </div>
+
+      <div class="col-md-8">
+        <label>Nama BUMDes *</label>
+        {{ form.nama_bumdes }}
+      </div>
+
+      <div class="col-md-4">
+        <label>Nomor SK</label>
+        {{ form.nomor_sk }}
+      </div>
+
+      <div class="col-md-4">
+        <label>Nomor PERDES</label>
+        {{ form.nomor_perdes }}
+      </div>
+
+      <div class="col-md-4">
+        <label>Tanggal PERDES</label>
+        {{ form.tanggal_perdes }}
+      </div>
+    </div>
+  </div>
+
+  <!-- PENGURUS -->
+  <div class="form-card">
+    <div class="form-section-title">
+      <i class="bi bi-people"></i> Susunan Pengurus
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label>Direktur</label>
+        {{ form.direktur }}
+      </div>
+
+      <div class="col-md-6">
+        <label>Komisaris</label>
+        {{ form.komisaris }}
+      </div>
+
+      <div class="col-md-6">
+        <label>Sekretaris</label>
+        {{ form.sekretaris }}
+      </div>
+
+      <div class="col-md-6">
+        <label>Bendahara</label>
+        {{ form.bendahara }}
+      </div>
+
+      <div class="col-md-12">
+        <label>Ketua Unit Usaha</label>
+        {{ form.ketua_unit_usaha }}
+      </div>
+    </div>
+  </div>
+
+  <!-- PENGAWAS -->
+  <div class="form-card">
+    <div class="form-section-title">
+      <i class="bi bi-shield-check"></i> Susunan Pengawas
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label>Ketua Pengawas</label>
+        {{ form.ketua_pengawas }}
+      </div>
+
+      <div class="col-md-4">
+        <label>Anggota 1</label>
+        {{ form.anggota_pengawas_1 }}
+      </div>
+
+      <div class="col-md-4">
+        <label>Anggota 2</label>
+        {{ form.anggota_pengawas_2 }}
+      </div>
+    </div>
+  </div>
+
+  <!-- DOKUMEN -->
+  <div class="form-card">
+    <div class="form-section-title">
+      <i class="bi bi-paperclip"></i> Upload Dokumen
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label>File SK</label>
+        <input type="file" name="file_sk" class="form-control">
+        {% if form.instance.file_sk %}
+        <small><a href="{{ form.instance.file_sk.url }}" target="_blank">File lama</a></small>
+        {% endif %}
+      </div>
+
+      <div class="col-md-4">
+        <label>Surat Pengantar</label>
+        <input type="file" name="file_surat_pengantar" class="form-control">
+      </div>
+
+      <div class="col-md-4">
+        <label>Berita Acara</label>
+        <input type="file" name="file_berita_acara" class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION -->
+  <div class="form-action">
+    <a href="{% url 'bumdes_list' %}" class="btn btn-outline-secondary">
+      ← Batal
+    </a>
+
+    <button type="submit" class="btn btn-primary">
+      💾 Simpan Draft
+    </button>
+  </div>
+
+</form>
+
+{% endblock %}

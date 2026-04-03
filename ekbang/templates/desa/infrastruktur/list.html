@@ -1,0 +1,192 @@
+{% extends 'includes/list_base.html' %}
+{% load static %}
+
+{% block list_extra_css %}
+<style>
+:root {
+  --primary-color: #0ea5e9;
+  --primary-hover: #0284c7;
+  --primary-light: rgba(14,165,233,0.15);
+}
+
+/* BUTTON */
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* HEADER ACCENT */
+#main-content .page-header::before {
+  background: var(--primary-color) !important;
+}
+
+/* SELECT */
+#main-content .form-select-sm:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px var(--primary-light) !important;
+}
+
+/* CARD */
+.table-card {
+  transition: all 0.2s ease;
+}
+.table-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08) !important;
+}
+
+/* FILE CHIP */
+.file-chip {
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* ACTION FIX */
+.action-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-left {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.action-right {
+  display: flex;
+  align-items: center;
+}
+
+/* WAIT CHIP */
+.wait-chip {
+  font-size: 12px;
+  background: #fef9c3;
+  color: #92400e;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* TEXT BODY */
+.info-row {
+  font-size: 13px;
+  color: #64748b;
+}
+</style>
+{% endblock %}
+
+{% block list_title %}
+Data Infrastruktur
+{% endblock %}
+
+{% block add_button %}
+<a href="{% url 'infrastruktur_create' %}" class="btn btn-primary btn-sm">
+  <i class="bi bi-plus-lg me-1"></i> Tambah
+</a>
+{% endblock %}
+
+{% block item_title %}
+{{ obj.kegiatan }}
+{% endblock %}
+
+{% block item_subtitle %}
+No SK: {{ obj.nomor_sk|default:"-" }} |
+Sumber: {{ obj.get_sumber_anggaran_display }}
+{% endblock %}
+
+{% block item_status_icon %}
+{% if obj.status == 'draft' %}📝
+{% elif obj.status == 'diajukan' %}⏳
+{% elif obj.status == 'disetujui' %}✅
+{% else %}❌{% endif %}
+{% endblock %}
+
+{% block item_body %}
+<div class="info-row mb-2">
+  <strong>Anggaran:</strong>
+  <span class="fw-semibold text-dark ms-1">
+    Rp {{ obj.anggaran|floatformat:0 }}
+  </span>
+</div>
+
+<div class="d-flex flex-wrap align-items-center gap-2 info-row">
+  <span><i class="bi bi-geo-alt"></i> {{ obj.details.count }} Lokasi</span>
+  <span><i class="bi bi-camera"></i> {{ obj.fotos.count }} Foto</span>
+
+  <div class="ms-md-auto d-flex gap-1">
+    {% if obj.file_rab %}<span class="file-chip">RAB</span>{% endif %}
+    {% if obj.file_lp_j %}<span class="file-chip">LPJ</span>{% endif %}
+    {% if obj.file_sk_tpk %}<span class="file-chip">SK TPK</span>{% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block item_actions %}
+<div class="action-wrapper">
+
+  <!-- KIRI -->
+  <div class="action-left">
+    <a href="{% url 'infrastruktur_detail' obj.pk %}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-eye"></i> Detail
+    </a>
+
+    {% if obj.status == 'draft' or obj.status == 'ditolak' %}
+    <a href="{% url 'infrastruktur_edit' obj.pk %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-pencil"></i> Edit
+    </a>
+
+    <button class="btn btn-sm btn-outline-danger"
+      data-bs-toggle="modal"
+      data-bs-target="#modalHapus"
+      data-url="{% url 'infrastruktur_delete' obj.pk %}">
+      <i class="bi bi-trash"></i> Hapus
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- KANAN -->
+  <div class="action-right">
+
+    {% if obj.status == 'draft' or obj.status == 'ditolak' %}
+    <form method="POST" action="{% url 'infrastruktur_submit' obj.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-primary px-3">
+        <i class="bi bi-send"></i> Ajukan
+      </button>
+    </form>
+    {% endif %}
+
+    {% if obj.status == 'diajukan' %}
+    <span class="wait-chip">
+      <i class="bi bi-hourglass-split"></i> Menunggu verifikasi
+    </span>
+    {% endif %}
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block empty_state %}
+<div class="table-card">
+  <div class="text-center py-5">
+    <div style="font-size:48px;">🏗️</div>
+    <h6 class="mt-3 fw-bold">Belum ada data infrastruktur</h6>
+    <p class="text-muted small">
+      Data belum tersedia, silakan tambahkan terlebih dahulu
+    </p>
+    <a href="{% url 'infrastruktur_create' %}" class="btn btn-primary mt-2">
+      Tambah Data
+    </a>
+  </div>
+</div>
+{% endblock %}

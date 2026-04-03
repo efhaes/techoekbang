@@ -1,0 +1,335 @@
+/* ═══════════════════════════════════════════════
+   bumdes/list.css — BUMDes List
+   Tone: Formal government information system
+═══════════════════════════════════════════════ */
+
+/* ── Page Header ── */
+#main-content .page-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid #e2e8f0;
+  position: relative;
+}
+
+#main-content .page-header::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 56px;
+  height: 3px;
+  background: #7c3aed;
+  border-radius: 2px;
+}
+
+#main-content .page-header h4 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
+}
+
+#main-content .page-header p {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Tahun select ── */
+#main-content .form-select-sm {
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  color: #1e1b4b;
+  background-color: #fff;
+  padding: 5px 28px 5px 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#main-content .form-select-sm:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
+  outline: none;
+}
+
+/* ── Record Card ── */
+#main-content .table-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #cbd5e1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: border-left-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+#main-content .table-card:hover {
+  box-shadow: 0 6px 20px rgba(124,58,237,0.09);
+  transform: translateY(-1px);
+}
+
+/* Warna border kiri sesuai status — tambahkan class di template jika mau */
+#main-content .table-card.status-draft     { border-left-color: #94a3b8; }
+#main-content .table-card.status-diajukan  { border-left-color: #f59e0b; }
+#main-content .table-card.status-disetujui { border-left-color: #10b981; }
+#main-content .table-card.status-ditolak   { border-left-color: #ef4444; }
+
+/* ── Card Header ── */
+#main-content .table-card-header {
+  padding: 1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafbfd;
+}
+
+#main-content .table-card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+#main-content .table-card-header .text-muted {
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Badge ── */
+#main-content .badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+#main-content .badge-draft {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+#main-content .badge-diajukan {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+#main-content .badge-disetujui {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+#main-content .badge-ditolak {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* ── Alert Ditolak ── */
+#main-content .alert-tolak {
+  background: #fef2f2;
+  border-left: 3px solid #ef4444;
+  border-top: 1px solid #fee2e2;
+  border-bottom: 1px solid #fee2e2;
+  border-right: none;
+  border-radius: 0;
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  color: #991b1b;
+  margin: 0;
+}
+
+/* ── Action Row ── */
+#main-content .table-card .p-3 {
+  padding: 0.8rem 1.25rem !important;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── Buttons ── */
+#main-content .btn-sm {
+  font-size: 0.75rem;
+  padding: 5px 13px;
+  border-radius: 7px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#main-content .btn-outline-primary {
+  border: 1.5px solid #c4b5fd;
+  color: #5b21b6;
+  background: #faf5ff;
+}
+#main-content .btn-outline-primary:hover {
+  background: #5b21b6;
+  border-color: #5b21b6;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(91,33,182,0.25);
+}
+
+#main-content .btn-primary {
+  background: #5b21b6;
+  border: none;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(91,33,182,0.2);
+}
+#main-content .btn-primary:hover {
+  background: #4c1d95;
+  box-shadow: 0 4px 14px rgba(91,33,182,0.35);
+}
+
+#main-content .btn-outline-secondary {
+  border: 1.5px solid #e2e8f0;
+  color: #475569;
+  background: #fff;
+}
+#main-content .btn-outline-secondary:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+#main-content .btn-outline-danger {
+  border: 1.5px solid #fca5a5;
+  color: #dc2626;
+  background: #fff;
+}
+#main-content .btn-outline-danger:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+#main-content .btn-danger {
+  background: #dc2626;
+  border: none;
+  color: #fff;
+}
+#main-content .btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* ── Waiting chip ── */
+#main-content .text-muted.small.align-self-center {
+  font-size: 0.7rem !important;
+  color: #b45309 !important;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Empty State ── */
+#main-content .table-card .text-center.py-5 {
+  padding: 4rem 1rem !important;
+}
+
+#main-content .table-card .text-center h6 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+#main-content .table-card .text-center p {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* ── Modal ── */
+.modal-content {
+  border: none;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.messages-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    width: 90%;
+}
+
+/* Styling alert agar lebih modern */
+.alert {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: #fff; /* Teks putih agar kontras */
+}
+
+/* Warna custom sesuai tag Django */
+.alert-success {
+    background-color: #28a745; /* Hijau sukses */
+}
+
+.alert-warning {
+    background-color: #ffc107; /* Kuning peringatan */
+    color: #000; /* Teks hitam khusus kuning */
+}
+
+.alert-error, .alert-danger {
+    background-color: #dc3545; /* Merah error */
+}
+
+.alert-info {
+    background-color: #17a2b8; /* Biru info */
+}
+
+/* Icon spacing */
+.alert i {
+    font-size: 1.25rem;
+    margin-right: 12px;
+}
+
+/* Tombol close putih */
+.btn-close {
+    filter: brightness(0) invert(1); /* Jadi putih */
+}
+
+.alert-warning .btn-close {
+    filter: none; /* Balikin hitam buat warning */
+}
+
+/* Animasi saat muncul */
+.fade.show {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

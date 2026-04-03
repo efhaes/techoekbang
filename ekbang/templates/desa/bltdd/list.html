@@ -1,0 +1,303 @@
+{% extends 'includes/base.html' %}
+{%load static%}
+{% block page_title %}BLT Dana Desa{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/desa/bltdd/list.css' %}">
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div>
+    <h4>BLT Dana Desa</h4>
+    <p>Desa {{ desa.nama }}</p>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <select class="form-select-tahun" style="width:auto;"
+      onchange="window.location.href='?tahun=' + this.value">
+      {% for t in tahun_list %}
+      <option value="{{ t }}" {% if t == tahun %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+    
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
+      <i class="bi bi-plus-lg me-1"></i> Tambah Data
+    </button>
+</div>
+</div>
+
+{% if bltdd_list %}
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="table-card-title">Daftar BLT Dana Desa</div>
+  </div>
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nomor SK</th>
+        <th>Jumlah KPM</th>
+        <th>Durasi</th> <th>Total Terima</th>
+        <th>Status</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+  {% for obj in bltdd_list %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td><b>{{ obj.nomor_sk }}</b></td>
+    <td>{{ obj.jumlah_kpm }} KPM</td>
+    <td>{{ obj.jumlah_bulan }} Bulan</td>
+    <td><b>Rp {{ obj.jumlah_total_terima|floatformat:0 }}</b></td>
+    <td>
+      <span class="badge badge-{{ obj.status }}">
+        {% if obj.status == 'draft' %}📝
+        {% elif obj.status == 'diajukan' %}⏳
+        {% elif obj.status == 'disetujui' %}✅
+        {% else %}❌{% endif %}
+        {{ obj.get_status_display }}
+      </span>
+    </td>
+    <td>
+      <div class="d-flex align-items-center">
+        <a href="{% url 'bltdd_detail' obj.pk %}" class="btn-action" title="Detail">
+          <i class="bi bi-eye"></i>
+        </a>
+        
+        {% if obj.status == 'draft' or obj.status == 'ditolak' %}
+        <button class="btn-action" title="Edit"
+          data-bs-toggle="modal" data-bs-target="#modalEdit"
+          data-pk="{{ obj.pk }}"
+          data-tahun="{{ obj.tahun_anggaran }}"
+          data-nomor_sk="{{ obj.nomor_sk }}"
+          data-jumlah_kpm="{{ obj.jumlah_kpm }}"
+          data-nominal_per_bulan="{{ obj.nominal_per_bulan }}"
+          data-jumlah_bulan="{{ obj.jumlah_bulan }}"
+          data-jumlah_total_terima="{{ obj.jumlah_total_terima }}"
+          data-sk="{{ obj.file_sk.name|default:'' }}"
+          data-lpj_sebelumnya="{{ obj.lpj_bulan_sebelumnya.name|default:'' }}"
+          data-ba="{{ obj.file_berita_acara.name|default:'' }}">
+          <i class="bi bi-pencil"></i>
+        </button>
+
+        <button class="btn-action danger" title="Hapus"
+          data-bs-toggle="modal" data-bs-target="#modalHapus"
+          data-url="{% url 'bltdd_delete' obj.pk %}">
+          <i class="bi bi-trash"></i>
+        </button>
+
+        <form method="POST" action="{% url 'bltdd_submit' obj.pk %}" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn-action" title="Ajukan"
+            onclick="return confirm('Ajukan data ini ke kecamatan?')">
+            <i class="bi bi-send"></i>
+          </button>
+        </form>
+        {% endif %}
+
+        {% if obj.status == 'diajukan' %}
+        <span class="text-muted ms-2" style="font-size:11px;">
+          <i class="bi bi-clock"></i> Menunggu...
+        </span>
+        {% endif %}
+      </div>
+    </td>
+  </tr>
+  
+  {% if obj.status == 'ditolak' and obj.catatan_verifikasi %}
+  <tr>
+    <td colspan="7">
+      <div class="alert-tolak">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Alasan Penolakan:</strong> {{ obj.catatan_verifikasi }}
+      </div>
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+</tbody>
+  </table>
+</div>
+{% else %}
+<div class="table-card">
+  <div class="text-center py-5">
+    <div style="font-size:48px;">💰</div>
+    <h6 class="mt-3 fw-bold">Belum ada data BLT Dana Desa</h6>
+    <p class="text-muted small">Klik tombol Tambah Data untuk menambahkan</p>
+    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalTambah">
+      <i class="bi bi-plus-lg me-1"></i> Tambah Data
+    </button>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Modal Tambah ── -->
+<div class="modal fade" id="modalTambah" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:14px; border:1px solid var(--border);">
+      <div class="modal-header border-0">
+        <h6 class="modal-title fw-bold">Tambah BLT Dana Desa</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'bltdd_create' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          {% include 'desa/bltdd/_form_fields.html' with form=form %}
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-save me-1"></i> Simpan Draft
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Edit ── -->
+<div class="modal fade" id="modalEdit" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:14px; border:1px solid var(--border);">
+      <div class="modal-header border-0">
+        <h6 class="modal-title fw-bold">Edit BLT Dana Desa</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" id="formEdit" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+           <div class="mb-3">
+            <label class="form-label">Tahun Anggaran</label>
+            <select name="tahun_anggaran" id="edit_tahun" class="form-select">
+              {% for t in tahun_list %}
+              <option value="{{ t }}">{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nomor SK <span class="text-danger">*</span></label>
+            <input type="text" name="nomor_sk" id="edit_nomor_sk" class="form-control" required>
+          </div>
+
+          <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Jumlah KPM</label>
+            <input type="number" name="jumlah_kpm" id="edit_jumlah_kpm" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Per Bulan (Rp)</label>
+            <input type="number" name="nominal_per_bulan" id="edit_nominal" class="form-control" value="300000">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Berapa Bulan?</label>
+            <input type="number" name="jumlah_bulan" id="edit_bulan" class="form-control" value="1" min="1" max="12">
+          </div>
+        </div>
+
+          <div class="mt-3">
+            <label class="form-label">Jumlah Total Terima (Rp)</label>
+            <input type="number" name="jumlah_total_terima" id="edit_total" class="form-control" readonly>
+            <div class="form-text">Otomatis terhitung dari KPM × Per Bulan</div>
+          </div>
+
+          <hr class="my-3">
+          <div class="mb-2 fw-semibold" style="font-size:13px;">
+            Upload Dokumen
+            <span class="text-muted fw-normal">(opsional, .pdf / .doc / .docx)</span>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">File SK BLT</label>
+              <input type="file" name="file_sk" class="form-control" accept=".pdf,.doc,.docx">
+              <div class="form-text" id="info_sk"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">LPJ Bulan Sebelumnya</label>
+              <input type="file" name="lpj_bulan_sebelumnya" class="form-control" accept=".pdf,.doc,.docx">
+              <div class="form-text" id="info_lpj_sebelumnya"></div>
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label">Berita Acara</label>
+              <input type="file" name="file_berita_acara" class="form-control" accept=".pdf,.doc,.docx">
+              <div class="form-text" id="info_ba"></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-save me-1"></i> Simpan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ===== LOGIKA MODAL EDIT =====
+    const modalEdit = document.getElementById('modalEdit');
+    if (modalEdit) {
+        modalEdit.addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget;
+            const pk  = btn.getAttribute('data-pk');
+
+            // Set Action Form
+            document.getElementById('formEdit').action = `/bltdd/${pk}/edit/`;
+            
+            // Isi Value Input
+            document.getElementById('edit_tahun').value      = btn.getAttribute('data-tahun'); 
+            document.getElementById('edit_nomor_sk').value   = btn.getAttribute('data-nomor_sk');
+            document.getElementById('edit_jumlah_kpm').value = btn.getAttribute('data-jumlah_kpm');
+            document.getElementById('edit_nominal').value    = btn.getAttribute('data-nominal_per_bulan');
+            document.getElementById('edit_bulan').value      = btn.getAttribute('data-jumlah_bulan') || 1;
+            document.getElementById('edit_total').value      = btn.getAttribute('data-jumlah_total_terima');
+
+            // Info file yang sudah ada
+            const sk       = btn.getAttribute('data-sk');
+            const lpj_sblm = btn.getAttribute('data-lpj_sebelumnya');
+            const ba       = btn.getAttribute('data-ba');
+
+            document.getElementById('info_sk').innerHTML = sk ? `<i class="bi bi-paperclip"></i> ${sk.split('/').pop()}` : '';
+            document.getElementById('info_lpj_sebelumnya').innerHTML = lpj_sblm ? `<i class="bi bi-paperclip"></i> ${lpj_sblm.split('/').pop()}` : '';
+            document.getElementById('info_ba').innerHTML = ba ? `<i class="bi bi-paperclip"></i> ${ba.split('/').pop()}` : '';
+        });
+
+        function hitungTotalEdit() {
+            const kpm     = parseFloat(document.getElementById('edit_jumlah_kpm')?.value) || 0;
+            const nominal = parseFloat(document.getElementById('edit_nominal')?.value) || 0;
+            const bulan   = parseFloat(document.getElementById('edit_bulan')?.value) || 0;
+            document.getElementById('edit_total').value = kpm * nominal * bulan;
+        }
+
+        document.getElementById('edit_jumlah_kpm')?.addEventListener('input', hitungTotalEdit);
+        document.getElementById('edit_nominal')?.addEventListener('input', hitungTotalEdit);
+        document.getElementById('edit_bulan')?.addEventListener('input', hitungTotalEdit);
+    }
+
+    // ===== LOGIKA MODAL TAMBAH =====
+    function hitungTotalTambah() {
+        const kpm     = parseFloat(document.getElementById('tambah_kpm')?.value) || 0;
+        const nominal = parseFloat(document.getElementById('tambah_nominal')?.value) || 0;
+        const bulan   = parseFloat(document.getElementById('tambah_bulan')?.value) || 0;
+        
+        const totalField = document.getElementById('tambah_total');
+        if (totalField) {
+            totalField.value = kpm * nominal * bulan;
+        }
+    }
+
+    document.getElementById('tambah_kpm')?.addEventListener('input', hitungTotalTambah);
+    document.getElementById('tambah_nominal')?.addEventListener('input', hitungTotalTambah);
+    document.getElementById('tambah_bulan')?.addEventListener('input', hitungTotalTambah);
+
+}); // <--- KURUNG PENUTUP INI TADI HILANG
+</script>
+{% endblock %}

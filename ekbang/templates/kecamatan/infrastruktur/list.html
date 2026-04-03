@@ -1,0 +1,467 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+{% block page_title %}Infrastruktur — Monitoring Kecamatan{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== THEME ADAPTATION (EMERALD GREEN) ===== */
+    :root {
+        --ekbang-primary: var(--primary); 
+        --ekbang-bg-light: var(--bg);    
+        --ekbang-border: var(--border);  
+        --ekbang-text: var(--text);      
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--ekbang-border);
+    }
+    .page-header h4 { font-weight: 800; color: var(--ekbang-text); margin: 0; }
+    .page-header p { font-size: 13px; color: var(--text-muted); margin: 5px 0 0 0; }
+
+    /* ===== GRID SYSTEM ===== */
+    .filter-card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ===== MODERN LEFT-ALIGNED CARDS ===== */
+    .card-item {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        border-radius: 16px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        background: #ffffff;
+        border: 1px solid var(--ekbang-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 110px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-item:hover {
+        transform: translateY(-5px);
+        border-color: var(--ekbang-primary);
+        box-shadow: var(--shadow-md);
+        background: var(--ekbang-bg-light);
+    }
+
+    .card-item.active {
+        background: var(--ekbang-primary);
+        border-color: var(--ekbang-primary);
+        box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.2);
+    }
+
+    .card-item small { 
+        z-index: 2;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--ekbang-primary);
+        font-size: 0.65rem; 
+        margin-bottom: 6px;
+    }
+
+    .card-item span { 
+        z-index: 2;
+        font-weight: 800; 
+        font-size: 1.15rem; 
+        color: var(--ekbang-text);
+        line-height: 1.2;
+    }
+
+    .card-item.active small, .card-item.active span, .card-item.active .card-info-extra { 
+        color: #ffffff; 
+    }
+
+    .card-info-extra {
+        z-index: 2;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Ikon Dekoratif (Infrastruktur/Crane) */
+    .card-icon-bg {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        color: var(--ekbang-primary);
+        opacity: 0.04;
+        transform: rotate(-15deg);
+        transition: 0.4s;
+    }
+
+    .card-item:hover .card-icon-bg {
+        opacity: 0.1;
+        transform: rotate(0deg) scale(1.1);
+    }
+
+    .card-item.active .card-icon-bg {
+        color: #ffffff;
+        opacity: 0.15;
+    }
+
+    /* ===== NAVIGATION & FILTERS ===== */
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        background: #fff;
+        border: 1px solid var(--ekbang-border);
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ekbang-primary);
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+        gap: 8px;
+        transition: 0.2s;
+    }
+    .btn-back:hover { background: var(--ekbang-bg-light); border-color: var(--ekbang-primary); }
+
+    .status-pill-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-pill {
+        padding: 8px 18px;
+        border-radius: 25px;
+        border: 1px solid var(--ekbang-border);
+        background: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .filter-pill:hover, .filter-pill.active-status {
+        background: var(--ekbang-primary);
+        color: #fff;
+        border-color: var(--ekbang-primary);
+    }
+
+    /* ===== TABLE STYLING ===== */
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--ekbang-border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-card-header {
+        padding: 1.25rem;
+        background: #fafafa;
+        border-bottom: 1px solid var(--ekbang-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .table { width: 100%; border-collapse: collapse; }
+    .table th {
+        background: #f1f5f9;
+        padding: 14px 12px;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #64748b;
+        letter-spacing: 0.8px;
+        font-weight: 800;
+    }
+    .table td { padding: 15px 12px; border-top: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle; }
+
+    tr.status-ditolak { background-color: #fff1f2; }
+    tr.status-diajukan { background-color: #fffbeb; }
+    tr:hover { background-color: #f0fdf4 !important; }
+
+    /* ===== BADGES & ACTIONS ===== */
+    .badge { padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .badge-diajukan { background: #fef3c7; color: #92400e; }
+    .badge-disetujui { background: #d1fae5; color: #065f46; }
+    .badge-ditolak { background: #fee2e2; color: #991b1b; }
+
+    .btn-action {
+        background: #f8fafc; color: var(--ekbang-primary);
+        width: 34px; height: 34px; border-radius: 10px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: 0.2s; border: 1px solid #e2e8f0; text-decoration: none;
+    }
+    .btn-action:hover { transform: scale(1.1); background: var(--ekbang-primary); color: #fff; }
+    .btn-action.danger:hover { background: #ef4444; border-color: #ef4444; }
+
+    /* SKELETON */
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        height: 20px; border-radius: 6px;
+    }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</style>
+
+<div class="page-header">
+    <h4>Monitoring Infrastruktur</h4>
+    <p>Verifikasi dan pantau progres pembangunan fisik di seluruh desa.</p>
+</div>
+
+<div id="backButton" style="display:none;">
+    <div class="btn-back" onclick="resetFilter()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Ganti Filter
+    </div>
+</div>
+
+<div id="yearSelection">
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; font-weight: 600;">Pilih Tahun Anggaran:</p>
+    <div class="filter-card-container">
+        {% for t in tahun_list %}
+        <div class="card-item" onclick="selectYear({{ t }})" data-tahun="{{ t }}">
+            <small>Data Tahun</small>
+            <span>{{ t }}</span>
+            <div class="card-icon-bg">
+                <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="desaSelection" style="display:none;">
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px; font-weight: 600;">Pilih Desa Pelaksana:</p>
+    <div class="filter-card-container">
+        {% for desa in desa_list %}
+        <div class="card-item" onclick="selectDesa({{ desa.pk }}, '{{ desa.nama|escapejs }}')" data-desa="{{ desa.pk }}">
+            <small>Wilayah Desa</small>
+            <span>{{ desa.nama }}</span>
+            <div class="card-info-extra">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Titik Pembangunan
+            </div>
+            <div class="card-icon-bg">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22v-5l5-5 5 5v5"></path><path d="M7 12V2h15l-5 5h-5"></path><path d="M11 7l2 2"></path><path d="M18 22v-3"></path></svg>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="dataContainer" style="display:none;">
+    <div class="status-pill-container">
+        <button onclick="filterByStatus(this, '')" class="filter-pill active-status">Semua Proyek</button>
+        <button onclick="filterByStatus(this, 'diajukan')" class="filter-pill">Menunggu (<span id="totalDiajukan">0</span>)</button>
+        <button onclick="filterByStatus(this, 'disetujui')" class="filter-pill">Disetujui (<span id="totalDisetujui">0</span>)</button>
+        <button onclick="filterByStatus(this, 'ditolak')" class="filter-pill">Ditolak (<span id="totalDitolak">0</span>)</button>
+    </div>
+
+    <div class="table-card">
+        <div class="table-card-header">
+            <div style="font-size: 15px; font-weight: 800; color: var(--ekbang-primary); display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 9l-5 5-2-2-4 4"></path></svg>
+                <span id="selectedDesa"></span> <span style="opacity:0.3; margin:0 5px;">/</span> <span id="selectedYear"></span>
+            </div>
+            
+            <div style="position: relative; width: 100%; max-width: 320px;">
+                <input type="text" id="tableSearch" onkeyup="searchTable()" placeholder="Cari nama kegiatan..." 
+                       style="width: 100%; padding: 10px 15px 10px 40px; border-radius: 14px; border: 1px solid var(--ekbang-border); font-size: 13px; outline: none;">
+                <svg style="position: absolute; left: 14px; top: 12px; color: var(--text-muted);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+        </div>
+        <div style="overflow-x: auto;">
+            <div id="dataTable"></div>
+        </div>
+    </div>
+</div>
+
+<div id="loadingIndicator" style="display:none; padding: 20px;" class="table-card">
+    <div class="skeleton" style="width: 40%; margin-bottom: 20px;"></div>
+    <div class="skeleton" style="height: 50px; margin-bottom: 10px;"></div>
+    <div class="skeleton" style="height: 50px; margin-bottom: 10px;"></div>
+    <div class="skeleton" style="height: 50px;"></div>
+</div>
+
+<div class="modal fade" id="modalTolak" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius:20px; border:none;">
+            <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding: 1.5rem;">
+                <h5 class="modal-title" style="font-weight:800; color: #ef4444;">Alasan Penolakan Proyek</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formTolak">
+                {% csrf_token %}
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <p style="font-size: 14px; margin-bottom: 1rem;">Anda menolak data: <strong id="modalNama"></strong></p>
+                    <textarea class="form-control" name="catatan_verifikasi" rows="4" required placeholder="Sebutkan alasan penolakan (misal: RAB tidak lengkap)..." style="border-radius: 12px; border: 1.5px solid #e2e8f0;"></textarea>
+                    <input type="hidden" name="status" value="ditolak">
+                </div>
+                <div class="modal-footer" style="border-top: none; padding: 1rem 1.5rem;">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 12px; font-weight: 700;">Batal</button>
+                    <button type="submit" class="btn btn-danger" style="border-radius: 12px; font-weight: 700; background: #ef4444; border:none; padding: 10px 25px;">Kirim Penolakan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedTahun = null;
+let selectedDesaId = null;
+let currentStatus = '';
+
+function clearActive(selector){
+    document.querySelectorAll(selector).forEach(el=>el.classList.remove('active'));
+}
+
+function selectYear(tahun){
+    selectedTahun = tahun;
+    clearActive('[data-tahun]');
+    const target = document.querySelector(`[data-tahun="${tahun}"]`);
+    if(target) target.classList.add('active');
+
+    document.getElementById('yearSelection').style.display='none';
+    document.getElementById('desaSelection').style.display='grid';
+    document.getElementById('backButton').style.display='block';
+}
+
+function selectDesa(id, name){
+    selectedDesaId = id;
+    clearActive('[data-desa]');
+    const target = document.querySelector(`[data-desa="${id}"]`);
+    if(target) target.classList.add('active');
+
+    document.getElementById('selectedYear').innerText = selectedTahun;
+    document.getElementById('selectedDesa').innerText = name;
+    loadData();
+}
+
+function filterByStatus(btn, status){
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active-status'));
+    btn.classList.add('active-status');
+    currentStatus = status;
+    loadData();
+}
+
+function searchTable() {
+    let input = document.getElementById("tableSearch").value.toUpperCase();
+    let rows = document.querySelectorAll("#dataTable table tbody tr");
+    rows.forEach(row => {
+        let text = row.innerText.toUpperCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    });
+}
+
+function loadData(){
+    document.getElementById('loadingIndicator').style.display='block';
+    document.getElementById('dataContainer').style.display='none';
+    document.getElementById('desaSelection').style.display='none';
+
+    fetch("{% url 'infrastruktur_filter_api' %}?tahun="+selectedTahun+"&desa_id="+selectedDesaId+"&status="+currentStatus)
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById('loadingIndicator').style.display='none';
+        document.getElementById('totalDiajukan').innerText = data.summary.total_diajukan;
+        document.getElementById('totalDisetujui').innerText = data.summary.total_disetujui;
+        document.getElementById('totalDitolak').innerText = data.summary.total_ditolak;
+
+        renderTable(data.data);
+        document.getElementById('dataContainer').style.display='block';
+    });
+}
+
+function renderTable(data){
+    if(data.length === 0){
+        document.getElementById('dataTable').innerHTML = `
+            <div style="padding:4rem 2rem; text-align:center; color:#94a3b8;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.2; margin-bottom:20px;"><path d="M2 22v-5l5-5 5 5v5"></path><path d="M7 12V2h15l-5 5h-5"></path></svg>
+                <p style="font-weight:600; font-size:16px;">Belum ada proyek pembangunan.</p>
+            </div>`;
+        return;
+    }
+    let html = `
+    <table class="table">
+    <thead>
+        <tr>
+            <th width="60">No</th>
+            <th>Nama Kegiatan / Proyek</th>
+            <th>Pagu Anggaran</th>
+            <th>Tgl Diajukan</th>
+            <th>Status</th>
+            <th style="text-align:center">Aksi</th>
+        </tr>
+    </thead>
+    <tbody>`;
+
+    data.forEach((obj, i)=>{
+        html+=`
+        <tr class="status-${obj.status}">
+            <td style="color:#94a3b8; font-weight:700;">${i+1}</td>
+            <td>
+                <div style="font-weight:800; color:#1e293b;">${obj.kegiatan}</div>
+                <div style="font-size:11px; color:#64748b; font-weight:600;">LOKASI: ${obj.desa_nama}</div>
+            </td>
+            <td><span style="font-weight:800; color:var(--ekbang-primary);">Rp ${obj.anggaran}</span></td>
+            <td><span style="font-size:12px; color:#64748b;">${obj.tanggal_diajukan}</span></td>
+            <td><span class="badge badge-${obj.status}">${obj.status_display}</span></td>
+            <td style="text-align:center">
+                <div class="d-flex gap-2 justify-content-center align-items-center">
+                    <a href="/infrastruktur/kecamatan/${obj.pk}/" class="btn-action" title="Lihat Detail">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </a>`;
+        
+        if (obj.status === 'diajukan') {
+            html += `
+                <form method="POST" action="/infrastruktur/kecamatan/${obj.pk}/verifikasi/" class="m-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="disetujui">
+                    <button type="submit" class="btn-action" style="color:#059669; border-color:#d1fae5;" title="Setujui" onclick="return confirm('Apakah Anda yakin menyetujui proyek ini?')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                </form>
+                <button class="btn-action danger" data-bs-toggle="modal" data-bs-target="#modalTolak" data-pk="${obj.pk}" data-nama="${obj.kegiatan}" title="Tolak">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>`;
+        }
+        html += `</div></td></tr>`;
+    });
+
+    html+="</tbody></table>";
+    document.getElementById('dataTable').innerHTML = html;
+}
+
+function resetFilter(){
+    selectedTahun = null;
+    selectedDesaId = null;
+    currentStatus = '';
+    document.getElementById('yearSelection').style.display='block';
+    document.getElementById('desaSelection').style.display='none';
+    document.getElementById('dataContainer').style.display='none';
+    document.getElementById('backButton').style.display='none';
+    clearActive('[data-tahun]');
+    clearActive('[data-desa]');
+    document.getElementById('tableSearch').value = '';
+}
+
+document.getElementById('modalTolak').addEventListener('show.bs.modal', function (e) {
+    const btn = e.relatedTarget;
+    document.getElementById('formTolak').action = `/infrastruktur/kecamatan/${btn.getAttribute('data-pk')}/verifikasi/`;
+    document.getElementById('modalNama').textContent = btn.getAttribute('data-nama');
+});
+</script>
+{% endblock %}

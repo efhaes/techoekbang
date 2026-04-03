@@ -1,0 +1,63 @@
+  {% load static %}
+<div id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-badge">
+
+        <img src="{% static 'img/logo.png' %}" class="brand-icon" alt="logo">
+
+      <div>
+        <div class="brand-text">EKBANG</div>
+        <div class="brand-sub">Desa {{ request.user.profile.desa.nama }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">{{ request.user.username|first|upper }}</div>
+    <div>
+      <div class="user-name">{{ request.user.username }}</div>
+      <div class="user-role">Admin Desa</div>
+    </div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-label">Menu Utama</div>
+
+    <a href="{% url 'dashboard_desa' %}"
+       class="nav-item menu-dashboard {% if request.resolver_match.url_name == 'dashboard_desa' %}active{% endif %}">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a href="{% url 'bumdes_list' %}"
+       class="nav-item menu-bumdes {% if 'bumdes' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-shop"></i> BUMDes
+    </a>
+    <a href="{% url 'bltdd_list' %}"
+       class="nav-item menu-blt {% if 'bltdd' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-cash-stack"></i> BLT Dana Desa
+    </a>
+    <a href="{% url 'infrastruktur_list' %}"
+       class="nav-item menu-infra {% if 'infrastruktur' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-buildings"></i> Infrastruktur
+    </a>
+    <a href="{% url 'koperasi_list' %}"
+       class="nav-item menu-koperasi {% if 'koperasi' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-people"></i> Koperasi
+    </a>
+    <a href="{% url 'ketahanan_pangan_list' %}"
+       class="nav-item menu-ketahanan {% if 'ketahanan_pangan' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-basket"></i> Ketahanan Pangan
+    </a>
+    <a href="{% url 'template_dokumen' %}"
+      class="nav-item {% if request.resolver_match.url_name == 'template_dokumen' %}active{% endif %}">
+      <i class="bi bi-file-earmark-text"></i> Template Dokumen
+    </a>
+  </div>
+
+   <form action="{% url 'logout' %}" method="POST">
+  {% csrf_token %}
+  <button type="submit" class="nav-item" style="color:#fca5a5; border:none; background:none;">
+    <i class="bi bi-box-arrow-left"></i> Logout
+  </button>
+</form>
+    
+</div>

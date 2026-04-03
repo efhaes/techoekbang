@@ -1,0 +1,226 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #22c55e; /* Green sesuai .menu-ketahanan */
+        --primary-light: #f0fdf4; /* Hijau sangat muda untuk background */
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    .form-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 5rem;
+    }
+
+    .form-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-section-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 2px solid var(--primary-light);
+        padding-bottom: 0.75rem;
+    }
+
+    .form-section-title i {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    /* Checkbox Grid Area */
+    .checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+        background: var(--primary-light);
+        padding: 1.25rem;
+        border-radius: 10px;
+        border: 1px dashed #bbf7d0; /* Border hijau muda */
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.1);
+    }
+
+    .file-preview {
+        font-size: 0.75rem;
+        margin-top: 5px;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        padding: 0.6rem 2rem;
+        font-weight: 700;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #16a34a !important; /* Hijau lebih gelap sedikit saat hover */
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-secondary {
+        padding: 0.6rem 2rem;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="page-header mb-4 border-start border-4 ps-3" style="border-color: var(--primary-color) !important;">
+        <h4 class="fw-bold text-dark mb-1">{{ title }}</h4>
+        <p class="text-muted mb-0 small">Input Data Pengelolaan Ketahanan Pangan Desa</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="bi bi-info-circle-fill"></i>
+                Data Kelompok & Anggaran
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Tahun Anggaran</label>
+                    {{ form.tahun_anggaran }}
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label">Nama Kelompok <span class="text-danger">*</span></label>
+                    {{ form.nama_kelompok }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ketua Kelompok</label>
+                    {{ form.ketua }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Pagu Anggaran (Rp)</label>
+                    {{ form.pembiayaan_anggaran }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nomor SK Penetapan</label>
+                    {{ form.nomor_sk }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tanggal SK</label>
+                    {{ form.tanggal_sk }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="bi bi-flower1"></i>
+                Bidang Usaha Ketahanan Pangan
+            </div>
+            <div class="checkbox-grid mb-4">
+                <div class="form-check">
+                    {{ form.usaha_pertanian }}
+                    <label class="form-check-label ms-1">Pertanian</label>
+                </div>
+                <div class="form-check">
+                    {{ form.usaha_peternakan }}
+                    <label class="form-check-label ms-1">Peternakan</label>
+                </div>
+                <div class="form-check">
+                    {{ form.usaha_perladangan }}
+                    <label class="form-check-label ms-1">Perladangan</label>
+                </div>
+                <div class="form-check">
+                    {{ form.usaha_perdagangan }}
+                    <label class="form-check-label ms-1">Perdagangan</label>
+                </div>
+                <div class="form-check">
+                    {{ form.usaha_perikanan }}
+                    <label class="form-check-label ms-1">Perikanan</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Keterangan Usaha Lainnya</label>
+                {{ form.usaha_lainnya }}
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+                Dokumen Administrasi
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label small">File SK Kelompok</label>
+                    <input type="file" name="file_sk" class="form-control" accept=".pdf,.doc,.docx">
+                    {% if form.instance.file_sk %}
+                    <div class="file-preview"><i class="bi bi-check2-all"></i> <a href="{{ form.instance.file_sk.url }}" target="_blank">File Tersimpan</a></div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small">Proposal Kegiatan</label>
+                    <input type="file" name="proposal" class="form-control" accept=".pdf,.doc,.docx">
+                    {% if form.instance.proposal %}
+                    <div class="file-preview"><i class="bi bi-check2-all"></i> <a href="{{ form.instance.proposal.url }}" target="_blank">File Tersimpan</a></div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">File LPJ</label>
+                    <input type="file" name="file_lpj_ketahanan" class="form-control" accept=".pdf,.doc,.docx">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">Surat Pengantar</label>
+                    <input type="file" name="file_surat_pengantar" class="form-control" accept=".pdf,.doc,.docx">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">Berita Acara</label>
+                    <input type="file" name="file_berita_acara" class="form-control" accept=".pdf,.doc,.docx">
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 mt-4">
+            <a href="{% url 'ketahanan_pangan_list' %}" class="btn btn-outline-secondary">
+                Batal
+            </a>
+            <button type="submit" class="btn btn-primary shadow">
+                <i class="bi bi-save2 me-2"></i>Simpan Laporan
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

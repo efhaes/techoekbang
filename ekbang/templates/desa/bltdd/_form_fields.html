@@ -1,0 +1,83 @@
+<div class="mb-3">
+  <label class="form-label">Tahun Anggaran</label>
+  <select name="tahun_anggaran" class="form-select">
+    {% for t in tahun_list %}
+    <option value="{{ t }}" {% if t == tahun %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Nomor SK <span class="text-danger">*</span></label>
+  <input type="text" name="nomor_sk" class="form-control"
+    placeholder="Contoh: 001/SK/2025" required
+    value="{{ form.nomor_sk.value|default:'' }}">
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <label>Jumlah KPM</label>
+        <input type="number" id="tambah_kpm" name="jumlah_kpm" class="form-control">
+    </div>
+    <div class="col-md-4">
+        <label>Per Bulan</label>
+        <input type="number" id="tambah_nominal" name="nominal_per_bulan" class="form-control" value="300000">
+    </div>
+    <div class="col-md-4">
+        <label>Berapa Bulan?</label>
+        <input type="number" id="tambah_bulan" name="jumlah_bulan" class="form-control" value="1">
+    </div>
+</div>
+
+<div class="mt-3">
+  <label class="form-label">Jumlah Total Terima (Rp)</label>
+  <input type="number" name="jumlah_total_terima" class="form-control"
+    id="tambah_total" placeholder="Otomatis terhitung" readonly
+    value="{{ form.jumlah_total_terima.value|default:'' }}">
+  <div class="form-text">Akan otomatis terhitung dari KPM × Per Bulan</div>
+</div>
+
+<hr class="my-3">
+<div class="mb-2 fw-semibold" style="font-size:13px;">
+  Upload Dokumen
+  <span class="text-muted fw-normal">(opsional, .pdf / .doc / .docx)</span>
+</div>
+
+<div class="row g-3">
+
+  <div class="col-md-6">
+    <label class="form-label">File SK BLT</label>
+    <input type="file" name="file_sk" class="form-control" accept=".pdf,.doc,.docx">
+    {% if form.instance.file_sk %}
+    <div class="form-text">
+      <i class="bi bi-paperclip"></i>
+      <a href="{{ form.instance.file_sk.url }}" target="_blank">File sebelumnya</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">LPJ Bulan Sebelumnya</label>
+    <input type="file" name="lpj_bulan_sebelumnya" class="form-control" accept=".pdf,.doc,.docx">
+    {% if form.instance.lpj_bulan_sebelumnya %}
+    <div class="form-text">
+      <i class="bi bi-paperclip"></i>
+      <a href="{{ form.instance.lpj_bulan_sebelumnya.url }}" target="_blank">File sebelumnya</a>
+    </div>
+    {% endif %}
+  </div>
+
+  
+
+  <div class="col-md-4">
+    <label class="form-label">Berita Acara</label>
+    <input type="file" name="file_berita_acara" class="form-control" accept=".pdf,.doc,.docx">
+    {% if form.instance.file_berita_acara %}
+    <div class="form-text">
+      <i class="bi bi-paperclip"></i>
+      <a href="{{ form.instance.file_berita_acara.url }}" target="_blank">File sebelumnya</a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>

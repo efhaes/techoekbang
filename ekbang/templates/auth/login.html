@@ -1,0 +1,120 @@
+
+
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Sistem Informasi Ekbang</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+
+<!-- Background effects -->
+<div class="bg-wrap">
+  <div class="bg-grid"></div>
+  <div class="bg-glow g1"></div>
+  <div class="bg-glow g2"></div>
+  <div class="bg-bar"></div>
+  <div class="bg-bar"></div>
+  <div class="bg-bar"></div>
+</div>
+
+<div class="page">
+
+  <!-- Left Panel -->
+  <div class="left-panel">
+    <div class="gov-badge">Sistem Informasi Pemerintahan</div>
+
+    <h1 class="left-title">
+      Ekbang<br>
+      <span>Kecamatan Rumpin</span>
+
+    </h1>
+
+    <p class="left-desc">
+      Platform terpadu pengelolaan data ekonomi dan pembangunan desa.
+      Transparansi, akuntabilitas, dan efisiensi administrasi dalam satu sistem.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-pill">
+        <div class="num">5</div>
+        <div class="lbl">Modul Aktif</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num">2</div>
+        <div class="lbl">Tingkat Akses</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num">100%</div>
+        <div class="lbl">Digital</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <div class="login-card">
+
+ <div class="emblem">
+  <img src="{% static 'img/logo.png' %}" alt="Logo" style="height:72px; object-fit:contain; margin-bottom:16px;">
+  <h2>Masuk ke Sistem</h2>
+  <p>Sistem Informasi Ekbang Kecamatan Rumpin</p>
+</div>
+
+      <div class="divider"></div>
+
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert">⚠ {{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input
+            type="text"
+            name="username"
+            class="form-control"
+            placeholder="Masukkan username"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input
+            type="password"
+            name="password"
+            class="form-control"
+            placeholder="Masukkan password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn-login">
+          Masuk &rarr;
+        </button>
+      </form>
+
+      <div class="card-footer-note">
+        Hanya untuk pengguna terdaftar &bull; Hubungi admin jika lupa akses
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
+{% endblock %}

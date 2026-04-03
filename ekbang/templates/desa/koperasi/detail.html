@@ -1,0 +1,348 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Detail Koperasi{% endblock %}
+{% block extra_css %}
+<style>
+    :root {
+        /* Tema Warna Koperasi: Teal */
+        --primary: #14b8a6; 
+        --primary-dark: #0d9488;
+        --primary-light: #f0fdfa;
+        --bg-light: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    /* ── Card Styling ── */
+    .form-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-section-title {
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+    }
+
+    .form-section-title i {
+        color: var(--primary); /* Icon judul jadi Teal */
+    }
+
+    /* ── Detail Label & Value ── */
+    .detail-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .detail-value {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    /* ── Document Link Styling ── */
+    .doc-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--bg-light);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-dark);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .doc-link:hover {
+        background: #fff;
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15); /* Shadow warna teal */
+    }
+
+    .doc-icon {
+        font-size: 1.4rem;
+        color: var(--primary);
+    }
+
+    /* ── History/Timeline ── */
+    .history-item {
+        border-left: 2px solid var(--border-color);
+        padding-left: 1.5rem;
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+
+    .history-item::before {
+        content: '';
+        position: absolute;
+        left: -7px;
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border: 2px solid var(--primary); /* Bulatan timeline jadi teal */
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    /* ── Footer Action Bar ── */
+    .action-container {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    /* Tombol Khusus Tema Koperasi */
+    .btn-primary {
+        background-color: var(--primary) !important;
+        border-color: var(--primary) !important;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark) !important;
+        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+    }
+
+    .btn-outline-primary {
+        color: var(--primary) !important;
+        border-color: var(--primary) !important;
+        font-weight: 600;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary) !important;
+        color: #fff !important;
+    }
+
+    /* ── Alert Penolakan ── */
+    .alert-tolak {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        border-left: 4px solid #ef4444;
+        color: #991b1b;
+        padding: 1.25rem;
+        border-radius: 10px;
+    }
+
+    /* ── Badges ── */
+    .badge-disetujui { background: #ccfbf1 !important; color: #115e59 !important; }
+    .badge-draft { background: #f1f5f9 !important; color: #475569 !important; }
+    .badge-diajukan { background: #fef9c3 !important; color: #854d0e !important; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1">{{ obj.nama_koperasi }}</h4>
+        <p class="text-muted mb-0"><i class="bi bi-geo-alt me-1"></i> Desa {{ obj.desa.nama }} — Tahun {{ obj.tahun_anggaran }}</p>
+    </div>
+    <div class="text-end">
+        <span class="badge badge-{{ obj.status }} px-3 py-2" style="font-size:13px; border-radius: 50px;">
+            {% if obj.status == 'draft' %}📝
+            {% elif obj.status == 'diajukan' %}⏳
+            {% elif obj.status == 'disetujui' %}✅
+            {% else %}❌{% endif %}
+            {{ obj.get_status_display }}
+        </span>
+    </div>
+</div>
+
+{% if obj.status == 'ditolak' and obj.catatan_verifikasi %}
+<div class="alert-tolak mb-4">
+    <div class="d-flex align-items-center gap-2 mb-1">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <strong style="font-size: 14px;">Catatan Penolakan Verifikator:</strong>
+    </div>
+    <p class="mb-0 small ms-4">{{ obj.catatan_verifikasi }}</p>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="bi bi-building"></i> Identitas Koperasi
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="detail-label">Nama Koperasi</div>
+                    <div class="detail-value text-primary">{{ obj.nama_koperasi }}</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Nomor SK Pengesahan</div>
+                    <div class="detail-value">{{ obj.nomor_sk|default:"-" }}</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Tanggal SK</div>
+                    <div class="detail-value">{{ obj.tanggal_sk|date:"d M Y"|default:"-" }}</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Nomor Akta Notaris</div>
+                    <div class="detail-value">{{ obj.akta_notaris_nomor|default:"-" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-card h-100">
+                    <div class="form-section-title">
+                        <i class="bi bi-people-fill"></i> Pengurus
+                    </div>
+                    <div class="mb-3">
+                        <div class="detail-label">Ketua</div>
+                        <div class="detail-value">{{ obj.ketua|default:"-" }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="detail-label">Sekretaris</div>
+                        <div class="detail-value">{{ obj.sekretaris|default:"-" }}</div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="detail-label">Bendahara</div>
+                        <div class="detail-value">{{ obj.bendahara|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-card h-100">
+                    <div class="form-section-title">
+                        <i class="bi bi-shield-check"></i> Pengawas
+                    </div>
+                    <div class="mb-3">
+                        <div class="detail-label">Ketua Pengawas</div>
+                        <div class="detail-value">{{ obj.ketua_pengawas|default:"-" }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="detail-label">Anggota 1</div>
+                        <div class="detail-value">{{ obj.anggota_pengawas_1|default:"-" }}</div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="detail-label">Anggota 2</div>
+                        <div class="detail-value">{{ obj.anggota_pengawas_2|default:"-" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card mt-4">
+            <div class="form-section-title">
+                <i class="bi bi-paperclip"></i> Dokumen Lampiran
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="detail-label mb-2">File SK Koperasi</div>
+                    {% if obj.file_sk %}
+                    <a href="{{ obj.file_sk.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-file-pdf doc-icon"></i>
+                        <span class="small fw-bold">Unduh SK</span>
+                    </a>
+                    {% else %}<span class="text-muted small">Tidak ada file</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label mb-2">File RAPBK</div>
+                    {% if obj.file_rapbk %}
+                    <a href="{{ obj.file_rapbk.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-file-earmark-bar-graph doc-icon"></i>
+                        <span class="small fw-bold">Unduh RAPBK</span>
+                    </a>
+                    {% else %}<span class="text-muted small">Tidak ada file</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label mb-2">Surat Pengantar</div>
+                    {% if obj.file_surat_pengantar %}
+                    <a href="{{ obj.file_surat_pengantar.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-envelope-paper doc-icon"></i>
+                        <span class="small fw-bold">Unduh Pengantar</span>
+                    </a>
+                    {% else %}<span class="text-muted small">Tidak ada file</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label mb-2">Berita Acara</div>
+                    {% if obj.file_berita_acara %}
+                    <a href="{{ obj.file_berita_acara.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-file-text doc-icon"></i>
+                        <span class="small fw-bold">Unduh Berita Acara</span>
+                    </a>
+                    {% else %}<span class="text-muted small">Tidak ada file</span>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <div class="col-lg-4">
+          <div class="form-card">
+              <div class="form-section-title">
+                  <i class="bi bi-clock-history"></i> Riwayat Pengajuan
+              </div>
+              <div class="history-item">
+                  <div class="detail-label">Diajukan Oleh</div>
+                  <div class="small fw-bold">
+                      {% if obj.diajukan_oleh %}
+                          {{ obj.diajukan_oleh.get_full_name|default:obj.diajukan_oleh.username }}
+                      {% else %}
+                          -
+                      {% endif %}
+                  </div>
+                  <div class="text-muted" style="font-size: 11px;">{{ obj.tanggal_diajukan|date:"d M Y, H:i"|default:"Belum diajukan" }}</div>
+              </div>
+              {% if obj.tanggal_verifikasi %}
+              <div class="history-item" style="padding-bottom: 0;">
+                  <div class="detail-label">Diverifikasi Pada</div>
+                  <div class="small fw-bold">Admin Kecamatan</div>
+                  <div class="text-muted" style="font-size: 11px;">{{ obj.tanggal_verifikasi|date:"d M Y, H:i" }}</div>
+              </div>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-4 mb-5 p-3 rounded-4" style="background: var(--bg-light); border: 1px solid var(--border-color);">
+      <a href="{% url 'koperasi_list' %}" class="btn btn-light border px-4 shadow-sm">
+          <i class="bi bi-arrow-left me-2"></i>Kembali
+      </a>
+      
+      <div class="d-flex gap-2">
+          {% if obj.status == 'draft' or obj.status == 'ditolak' %}
+          <a href="{% url 'koperasi_edit' obj.pk %}" class="btn btn-outline-primary px-4 shadow-sm">
+              <i class="bi bi-pencil-square me-2"></i>Edit Data
+          </a>
+          
+          <form method="POST" action="{% url 'koperasi_submit' obj.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary px-4 shadow-sm" onclick="return confirm('Ajukan data ini ke kecamatan?')">
+                  <i class="bi bi-send-fill me-2"></i>Ajukan Ke Kecamatan
+              </button>
+          </form>
+          {% endif %}
+      </div>
+  </div>
+{% endblock %}

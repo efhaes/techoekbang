@@ -1,0 +1,202 @@
+/* CARD */
+.modern-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.5rem;
+  border: 1px solid #f1f5f9;
+  transition: all 0.25s ease;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+}
+
+.modern-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* ICON */
+.icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* WARNA ICON */
+.icon.purple { background: #f3e8ff; color: #a855f7; }
+.icon.orange { background: #fff7ed; color: #f97316; }
+.icon.blue   { background: #e0f2fe; color: #0ea5e9; }
+.icon.teal   { background: #ccfbf1; color: #14b8a6; }
+.icon.green  { background: #dcfce7; color: #22c55e; }
+
+/* BADGE */
+.badge {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.badge.gray {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.badge.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge.warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+/* TEXT */
+.desc {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+/* MINI INFO */
+.mini-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+/* LINK */
+.card-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #0f172a;
+  transition: 0.2s;
+}
+
+.card-link:hover {
+  color: #10b981;
+}
+.badge-draft {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.badge-diajukan {
+  background: #facc15;
+  color: #92400e;
+}
+
+.badge-disetujui {
+  background: #22c55e;
+  color: white;
+}
+
+.badge-ditolak {
+  background: #ef4444;
+  color: white;
+}
+
+.badge-gray {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+.stat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 10px 0;
+}
+
+.pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.pill.draft      { background: #f1f5f9; color: #64748b; }
+.pill.diajukan   { background: #fef9c3; color: #a16207; }
+.pill.disetujui  { background: #dcfce7; color: #15803d; }
+.pill.ditolak    { background: #fee2e2; color: #b91c1c; }
+
+
+.donut-summary-wrap {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+
+.donut-center-label {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.donut-center-label span {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.donut-center-label small {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.donut-legend-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  transition: opacity 0.2s;
+}
+
+.donut-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.donut-legend-item div {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.donut-legend-item strong {
+  font-weight: 600;
+}
+
+.donut-legend-item span:last-child {
+  color: #64748b;
+  font-size: 12px;
+}
+

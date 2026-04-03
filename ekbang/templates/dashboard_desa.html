@@ -1,0 +1,285 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+
+{% block page_title %}Dashboard Desa{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/desa/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h4>Selamat Datang, {{ request.user.username }}</h4>
+  <p>Desa {{ desa.nama }} — Tahun {{ tahun }}</p>
+</div>
+
+<div class="row g-3">
+
+  <!-- BUMDES -->
+  <div class="col-md-4">
+    <div class="modern-card">
+      <div class="card-header">
+        <div class="icon purple"><i class="bi bi-shop"></i></div>
+        {% if bumdes %}
+          <span class="badge badge-{{ bumdes.status }}">{{ bumdes.get_status_display }}</span>
+        {% else %}
+          <span class="badge gray">Kosong</span>
+        {% endif %}
+      </div>
+      <h5>BUMDes</h5>
+      <p class="desc">Data usaha milik desa</p>
+      <div class="mini-info"><span>Nama</span><span>{{ bumdes.nama_bumdes|default:"-" }}</span></div>
+      <div class="mini-info"><span>Direktur</span><span>{{ bumdes.direktur|default:"-" }}</span></div>
+      {% with s=stats.bumdes %}
+      <div class="stat-pills">
+        <span class="pill draft">{{ s.draft }} Draft</span>
+        <span class="pill diajukan">{{ s.diajukan }} Diajukan</span>
+        <span class="pill disetujui">{{ s.disetujui }} Disetujui</span>
+        <span class="pill ditolak">{{ s.ditolak }} Ditolak</span>
+      </div>
+      {% endwith %}
+      <a href="{% url 'bumdes_list' %}" class="card-link">Kelola →</a>
+    </div>
+  </div>
+
+  <!-- BLT -->
+  <div class="col-md-4">
+    <div class="modern-card">
+      <div class="card-header">
+        <div class="icon orange"><i class="bi bi-cash-stack"></i></div>
+        {% if bltdd %}
+          <span class="badge badge-{{ bltdd.status }}">{{ bltdd.get_status_display }}</span>
+        {% else %}
+          <span class="badge gray">Kosong</span>
+        {% endif %}
+      </div>
+      <h5>BLT Dana Desa</h5>
+      <p class="desc">Bantuan langsung tunai</p>
+      <div class="mini-info"><span>KPM</span><span>{{ bltdd.jumlah_kpm|default:"0" }}</span></div>
+      <div class="mini-info"><span>Total</span><span>Rp {{ bltdd.jumlah_total_terima|default:"0" }}</span></div>
+      {% with s=stats.bltdd %}
+      <div class="stat-pills">
+        <span class="pill draft">{{ s.draft }} Draft</span>
+        <span class="pill diajukan">{{ s.diajukan }} Diajukan</span>
+        <span class="pill disetujui">{{ s.disetujui }} Disetujui</span>
+        <span class="pill ditolak">{{ s.ditolak }} Ditolak</span>
+      </div>
+      {% endwith %}
+      <a href="{% url 'bltdd_list' %}" class="card-link">Kelola →</a>
+    </div>
+  </div>
+
+  <!-- INFRA -->
+  <div class="col-md-4">
+    <div class="modern-card">
+      <div class="card-header">
+        <div class="icon blue"><i class="bi bi-buildings"></i></div>
+        {% if infrastruktur %}
+          <span class="badge badge-{{ infrastruktur.status }}">{{ infrastruktur.get_status_display }}</span>
+        {% else %}
+          <span class="badge gray">Kosong</span>
+        {% endif %}
+      </div>
+      <h5>Infrastruktur</h5>
+      <p class="desc">Pembangunan desa</p>
+      <div class="mini-info"><span>Kegiatan</span><span>{{ infrastruktur.kegiatan|default:"-" }}</span></div>
+      <div class="mini-info"><span>Anggaran</span><span>Rp {{ infrastruktur.anggaran|default:"0" }}</span></div>
+      {% with s=stats.infra %}
+      <div class="stat-pills">
+        <span class="pill draft">{{ s.draft }} Draft</span>
+        <span class="pill diajukan">{{ s.diajukan }} Diajukan</span>
+        <span class="pill disetujui">{{ s.disetujui }} Disetujui</span>
+        <span class="pill ditolak">{{ s.ditolak }} Ditolak</span>
+      </div>
+      {% endwith %}
+      <a href="{% url 'infrastruktur_list' %}" class="card-link">Kelola →</a>
+    </div>
+  </div>
+
+  <!-- KOPERASI -->
+  <div class="col-md-4">
+    <div class="modern-card">
+      <div class="card-header">
+        <div class="icon teal"><i class="bi bi-people"></i></div>
+        {% if koperasi %}
+          <span class="badge badge-{{ koperasi.status }}">{{ koperasi.get_status_display }}</span>
+        {% else %}
+          <span class="badge gray">Kosong</span>
+        {% endif %}
+      </div>
+      <h5>Koperasi</h5>
+      <p class="desc">Data koperasi desa</p>
+      <div class="mini-info"><span>Nama</span><span>{{ koperasi.nama_koperasi|default:"-" }}</span></div>
+      <div class="mini-info"><span>Ketua</span><span>{{ koperasi.ketua|default:"-" }}</span></div>
+      {% with s=stats.koperasi %}
+      <div class="stat-pills">
+        <span class="pill draft">{{ s.draft }} Draft</span>
+        <span class="pill diajukan">{{ s.diajukan }} Diajukan</span>
+        <span class="pill disetujui">{{ s.disetujui }} Disetujui</span>
+        <span class="pill ditolak">{{ s.ditolak }} Ditolak</span>
+      </div>
+      {% endwith %}
+      <a href="{% url 'koperasi_list' %}" class="card-link">Kelola →</a>
+    </div>
+  </div>
+
+  <!-- PANGAN -->
+  <div class="col-md-4">
+    <div class="modern-card">
+      <div class="card-header">
+        <div class="icon green"><i class="bi bi-basket"></i></div>
+        {% if ketahanan %}
+          <span class="badge badge-{{ ketahanan.status }}">{{ ketahanan.get_status_display }}</span>
+        {% else %}
+          <span class="badge gray">Kosong</span>
+        {% endif %}
+      </div>
+      <h5>Ketahanan Pangan</h5>
+      <p class="desc">Kelompok pangan desa</p>
+      <div class="mini-info"><span>Kelompok</span><span>{{ ketahanan.nama_kelompok|default:"-" }}</span></div>
+      <div class="mini-info"><span>Ketua</span><span>{{ ketahanan.ketua|default:"-" }}</span></div>
+      {% with s=stats.ketahanan %}
+      <div class="stat-pills">
+        <span class="pill draft">{{ s.draft }} Draft</span>
+        <span class="pill diajukan">{{ s.diajukan }} Diajukan</span>
+        <span class="pill disetujui">{{ s.disetujui }} Disetujui</span>
+        <span class="pill ditolak">{{ s.ditolak }} Ditolak</span>
+      </div>
+      {% endwith %}
+      <a href="{% url 'ketahanan_pangan_list' %}" class="card-link">Kelola →</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── DONUT CHART: perbandingan semua modul ── -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="modern-card">
+      <h5>Rekap Modul — {{ tahun }}</h5>
+      <p class="desc">Total pengajuan per modul tahun ini</p>
+
+      <div class="donut-summary-wrap">
+        <div style="position:relative; width:260px; height:260px; flex-shrink:0;">
+          <canvas id="chart-modul"></canvas>
+          <div class="donut-center-label">
+            <span id="donut-total">0</span>
+            <small>Total</small>
+          </div>
+        </div>
+        <div class="donut-legend-wrap">
+          <div class="donut-legend-item" data-idx="0">
+            <span class="donut-dot" style="background:#7c3aed"></span>
+            <div>
+              <strong>BUMDes</strong>
+              <span id="val-bumdes">0</span> pengajuan
+            </div>
+          </div>
+          <div class="donut-legend-item" data-idx="1">
+            <span class="donut-dot" style="background:#ea580c"></span>
+            <div>
+              <strong>BLT Dana Desa</strong>
+              <span id="val-bltdd">0</span> pengajuan
+            </div>
+          </div>
+          <div class="donut-legend-item" data-idx="2">
+            <span class="donut-dot" style="background:#2563eb"></span>
+            <div>
+              <strong>Infrastruktur</strong>
+              <span id="val-infra">0</span> pengajuan
+            </div>
+          </div>
+          <div class="donut-legend-item" data-idx="3">
+            <span class="donut-dot" style="background:#0d9488"></span>
+            <div>
+              <strong>Koperasi</strong>
+              <span id="val-koperasi">0</span> pengajuan
+            </div>
+          </div>
+          <div class="donut-legend-item" data-idx="4">
+            <span class="donut-dot" style="background:#16a34a"></span>
+            <div>
+              <strong>Ketahanan Pangan</strong>
+              <span id="val-ketahanan">0</span> pengajuan
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{# inject data stats ke JS #}
+<script>
+  const _stats = {
+    bumdes:   { draft: {{ stats.bumdes.draft }},   diajukan: {{ stats.bumdes.diajukan }},   disetujui: {{ stats.bumdes.disetujui }},   ditolak: {{ stats.bumdes.ditolak }}   },
+    bltdd:    { draft: {{ stats.bltdd.draft }},    diajukan: {{ stats.bltdd.diajukan }},    disetujui: {{ stats.bltdd.disetujui }},    ditolak: {{ stats.bltdd.ditolak }}    },
+    infra:    { draft: {{ stats.infra.draft }},    diajukan: {{ stats.infra.diajukan }},    disetujui: {{ stats.infra.disetujui }},    ditolak: {{ stats.infra.ditolak }}    },
+    koperasi: { draft: {{ stats.koperasi.draft }}, diajukan: {{ stats.koperasi.diajukan }}, disetujui: {{ stats.koperasi.disetujui }}, ditolak: {{ stats.koperasi.ditolak }} },
+    ketahanan:{ draft: {{ stats.ketahanan.draft }},diajukan: {{ stats.ketahanan.diajukan }},disetujui: {{ stats.ketahanan.disetujui }},ditolak: {{ stats.ketahanan.ditolak }} },
+  };
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // total per modul = draft + diajukan + disetujui + ditolak
+  const total = k => Object.values(_stats[k]).reduce((a, b) => a + b, 0);
+
+  const keys   = ['bumdes', 'bltdd', 'infra', 'koperasi', 'ketahanan'];
+  const labels = ['BUMDes', 'BLT Dana Desa', 'Infrastruktur', 'Koperasi', 'Ketahanan Pangan'];
+  const colors = ['#7c3aed', '#ea580c', '#2563eb', '#0d9488', '#16a34a'];
+  const data   = keys.map(total);
+  const grand  = data.reduce((a, b) => a + b, 0);
+
+  // update legend values
+  keys.forEach((k, i) => {
+    const el = document.getElementById('val-' + k);
+    if (el) el.textContent = data[i];
+  });
+  document.getElementById('donut-total').textContent = grand;
+
+  new Chart(document.getElementById('chart-modul'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: grand === 0 ? [1,1,1,1,1] : data,
+        backgroundColor: grand === 0 ? colors.map(c => c + '33') : colors,
+        borderWidth: 3,
+        borderColor: '#fff',
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      cutout: '68%',
+      animation: { animateRotate: true, duration: 800 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${grand === 0 ? 0 : ctx.parsed} pengajuan`
+          }
+        }
+      }
+    }
+  });
+
+  // hover highlight legend
+  const legendItems = document.querySelectorAll('.donut-legend-item');
+  legendItems.forEach((item, i) => {
+    item.addEventListener('mouseenter', () => legendItems.forEach((el, j) => {
+      el.style.opacity = i === j ? '1' : '0.4';
+    }));
+    item.addEventListener('mouseleave', () => legendItems.forEach(el => el.style.opacity = '1'));
+  });
+});
+</script>
+
+
+{% endblock %}

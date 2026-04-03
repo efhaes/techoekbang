@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Ekbang Kecamatan{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if request.user.is_authenticated %}
+<div class="d-flex" id="wrapper">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  {% if request.user.profile.is_kecamatan %}
+    {% include 'includes/sidebar_kecamatan.html' %}
+  {% else %}
+    {% include 'includes/sidebar_desa.html' %}
+  {% endif %}
+  <!-- ═══ END SIDEBAR ═══ -->
+
+  <!-- ═══ CONTENT ═══ -->
+  <div id="content-wrapper">
+    <div id="topbar">
+
+      <button id="sidebarToggle"><i class="bi bi-list fs-5"></i></button>
+      <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+      <div class="topbar-right">
+
+        {% if request.user.profile.is_kecamatan %}
+        <!-- Lonceng notifikasi -->
+        <div class="topbar-btn position-relative" id="notif-btn"
+          style="cursor:pointer;" data-bs-toggle="dropdown">
+          <i class="bi bi-bell"></i>
+          <span class="notif-dot" id="notif-dot" style="display:none;"></span>
+        </div>
+        <div class="dropdown-menu dropdown-menu-end p-0"
+          style="width:320px; border-radius:12px; border:1px solid var(--border); box-shadow: var(--shadow-md);">
+          <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+            <span class="fw-bold" style="font-size:13px;">Permohonan Masuk</span>
+            <a href="{% url 'review_list' %}" style="font-size:12px; color:var(--primary);">Lihat Semua</a>
+          </div>
+          <div id="notif-list" style="max-height:320px; overflow-y:auto;">
+            <div class="text-center py-4 text-muted" style="font-size:13px;" id="notif-empty">
+              <i class="bi bi-check-circle"></i> Tidak ada permohonan
+            </div>
+          </div>
+        </div>
+
+        <div class="topbar-desa">🏛 Kecamatan</div>
+        {% else %}
+        <div class="topbar-desa">🏡 Desa {{ request.user.profile.desa.nama }}</div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <div id="main-content">
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+  <!-- ═══ END CONTENT ═══ -->
+
+</div>
+
+<!-- ── Modal Hapus Universal ── -->
+<div class="modal fade" id="modalHapus" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" style="border-radius:14px; border:1px solid var(--border);">
+      <div class="modal-header border-0 pb-0">
+        <h6 class="modal-title fw-bold">🗑 Hapus Data</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" style="font-size:13px;">
+          Yakin ingin menghapus data ini? Tindakan tidak bisa dibatalkan.
+        </p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+        <form method="POST" id="formHapus">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-trash me-1"></i> Hapus
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Sidebar toggle — responsive
+  document.getElementById('sidebarToggle')?.addEventListener('click', function () {
+    const wrapper = document.getElementById('wrapper');
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+      wrapper.classList.toggle('sidebar-open');
+    } else {
+      wrapper.classList.toggle('sidebar-collapsed');
+    }
+  });
+
+  // Tutup sidebar kalau klik overlay (mobile)
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // Inject overlay element
+    const overlay = document.createElement('div');
+    overlay.id = 'sidebar-overlay';
+    document.getElementById('wrapper')?.appendChild(overlay);
+
+    overlay.addEventListener('click', function () {
+      document.getElementById('wrapper').classList.remove('sidebar-open');
+    });
+
+    // Modal Hapus Universal
+    const modalHapus = document.getElementById('modalHapus');
+    if (modalHapus) {
+      modalHapus.addEventListener('show.bs.modal', function (e) {
+        const btn = e.relatedTarget;
+        document.getElementById('formHapus').action = btn.getAttribute('data-url');
+      });
+    }
+
+  });
+</script>
+{% block extra_js %}
+{% if request.user.is_authenticated and request.user.profile.is_kecamatan %}
+<script>
+  let prevCount = 0;
+
+  function showToast(item) {
+    const id = 'toast-' + Date.now();
+    const html = `
+      <div id="${id}" class="toast show align-items-center mb-2"
+        style="border-radius:10px; border:1px solid var(--border);
+               background:#fff; box-shadow:var(--shadow-md); min-width:280px;">
+        <div class="d-flex">
+          <div class="toast-body" style="font-size:13px;">
+            <div class="fw-bold mb-1">${item.icon} ${item.modul} — ${item.desa}</div>
+            <div class="text-muted">${item.nama}</div>
+            <div style="font-size:11px; color:#9ca3af; margin-top:3px;">${item.waktu}</div>
+            <a href="${item.url}" class="btn btn-sm btn-primary mt-2" style="font-size:11px;">
+              Review Sekarang
+            </a>
+          </div>
+          <button type="button" class="btn-close me-2 m-auto"
+            onclick="document.getElementById('${id}').remove()"></button>
+        </div>
+      </div>`;
+    document.getElementById('toast-container').insertAdjacentHTML('beforeend', html);
+
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }, 6000);
+  }
+
+  function updateNotifDropdown(items) {
+    const list = document.getElementById('notif-list');
+
+    if (items.length === 0) {
+      list.innerHTML = `
+        <div class="text-center py-4 text-muted" style="font-size:13px;">
+          <i class="bi bi-check-circle"></i> Tidak ada permohonan
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(item => `
+      <a href="${item.url}" class="d-block px-3 py-2 text-decoration-none"
+        style="border-bottom:1px solid var(--border); transition:background 0.15s;"
+        onmouseover="this.style.background='#f0fdf4'"
+        onmouseout="this.style.background='transparent'">
+        <div style="font-size:13px; font-weight:600; color:var(--text);">
+          ${item.icon} ${item.modul} — ${item.desa}
+        </div>
+        <div style="font-size:12px; color:var(--text-muted);">${item.nama}</div>
+        <div style="font-size:11px; color:#9ca3af;">${item.waktu}</div>
+      </a>
+    `).join('');
+  }
+
+  function pollNotifikasi() {
+    fetch('/api/notifikasi/')
+      .then(res => res.json())
+      .then(data => {
+        const count = data.count;
+        const items = data.items;
+
+        const badge = document.getElementById('notif-badge');
+        const dot = document.getElementById('notif-dot');
+
+        if (count > 0) {
+          badge.textContent = count;
+          badge.style.display = 'inline-flex';
+          dot.style.display = 'block';
+        } else {
+          badge.style.display = 'none';
+          dot.style.display = 'none';
+        }
+
+        updateNotifDropdown(items);
+
+        if (count > prevCount && prevCount !== 0) {
+          const newItems = items.slice(0, count - prevCount);
+          newItems.forEach(item => showToast(item));
+        }
+
+        prevCount = count;
+      })
+      .catch(err => console.log('Notif polling error:', err));
+  }
+
+  pollNotifikasi();
+  setInterval(pollNotifikasi, 30000);
+</script>
+{% endif %}
+{% endblock %}
+
+<!-- Toast Container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:9999;" id="toast-container"></div>
+</body>
+</html>

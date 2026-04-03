@@ -1,0 +1,288 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Detail BUMDes{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+:root {
+  --primary-color: #7c3aed;
+  --primary-light: #f5f3ff;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+}
+
+/* Container */
+.detail-container {
+  max-width: 1100px;
+  margin: auto;
+  padding-bottom: 90px;
+}
+
+/* Header */
+.header-box {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Card */
+.info-card {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.card-header-custom {
+  background: var(--primary-light);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.card-body-custom {
+  padding: 14px 16px;
+}
+
+/* Row data */
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.data-row:last-child {
+  border-bottom: none;
+}
+
+.label-text {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.value-text {
+  font-weight: 600;
+  font-size: 13px;
+  text-align: right;
+}
+
+/* Status */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-draft { background:#f1f5f9; color:#475569; }
+.badge-diajukan { background:#fef3c7; color:#b45309; }
+.badge-disetujui { background:#dcfce7; color:#15803d; }
+.badge-ditolak { background:#fee2e2; color:#b91c1c; }
+
+/* Dokumen */
+.doc-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  text-decoration: none;
+}
+
+.doc-item:hover {
+  background: #fff;
+  border: 1px solid var(--primary-color);
+}
+
+.doc-item i {
+  margin-right: 10px;
+  color: var(--primary-color);
+}
+
+/* Footer */
+.footer-actions {
+
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+
+  <!-- HEADER -->
+  <div class="header-box">
+    <div>
+      <h5 class="fw-bold mb-1">{{ bumdes.nama_bumdes }}</h5>
+      <small class="text-muted">ID: #BUMDES-{{ bumdes.pk }}</small>
+    </div>
+
+    <div class="text-end">
+      <div class="small text-muted">Status</div>
+      <span class="status-badge badge-{{ bumdes.status }}">
+        {{ bumdes.get_status_display }}
+      </span>
+    </div>
+  </div>
+
+  <!-- ALERT -->
+  {% if bumdes.status == 'ditolak' %}
+  <div class="alert alert-danger">
+    {{ bumdes.catatan_verifikasi }}
+  </div>
+  {% endif %}
+
+  <div class="row g-3">
+
+    <!-- IDENTITAS -->
+    <div class="col-md-6">
+      <div class="info-card">
+        <div class="card-header-custom">
+          <i class="bi bi-building"></i> Identitas
+        </div>
+        <div class="card-body-custom">
+          <div class="data-row">
+            <span class="label-text">Tahun</span>
+            <span class="value-text">{{ bumdes.tahun_anggaran }}</span>
+          </div>
+          <div class="data-row">
+            <span class="label-text">Desa</span>
+            <span class="value-text">{{ bumdes.desa.nama }}</span>
+          </div>
+          <div class="data-row">
+            <span class="label-text">Nomor SK</span>
+            <span class="value-text">{{ bumdes.nomor_sk|default:"-" }}</span>
+          </div>
+          <div class="data-row">
+            <span class="label-text">PERDES</span>
+            <span class="value-text">{{ bumdes.nomor_perdes|default:"-" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PENGURUS -->
+    <div class="col-md-6">
+      <div class="info-card">
+        <div class="card-header-custom">
+          <i class="bi bi-people"></i> Pengurus
+        </div>
+        <div class="card-body-custom">
+          <div class="data-row"><span class="label-text">Direktur</span><span class="value-text">{{ bumdes.direktur|default:"-" }}</span></div>
+          <div class="data-row"><span class="label-text">Sekretaris</span><span class="value-text">{{ bumdes.sekretaris|default:"-" }}</span></div>
+          <div class="data-row"><span class="label-text">Bendahara</span><span class="value-text">{{ bumdes.bendahara|default:"-" }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PENGAWAS -->
+    <div class="col-md-6">
+      <div class="info-card">
+        <div class="card-header-custom">
+          <i class="bi bi-shield-check"></i> Pengawas
+        </div>
+        <div class="card-body-custom">
+          <div class="data-row"><span class="label-text">Ketua</span><span class="value-text">{{ bumdes.ketua_pengawas|default:"-" }}</span></div>
+          <div class="data-row"><span class="label-text">Anggota 1</span><span class="value-text">{{ bumdes.anggota_pengawas_1|default:"-" }}</span></div>
+          <div class="data-row"><span class="label-text">Anggota 2</span><span class="value-text">{{ bumdes.anggota_pengawas_2|default:"-" }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOKUMEN -->
+    <div class="col-md-6">
+      <div class="info-card">
+        <div class="card-header-custom">
+          <i class="bi bi-file-earmark"></i> Dokumen
+        </div>
+        <div class="card-body-custom">
+
+          {% if bumdes.file_sk %}
+          <a href="{{ bumdes.file_sk.url }}" target="_blank" class="doc-item">
+            <i class="bi bi-file-earmark"></i> File SK
+          </a>
+          {% endif %}
+
+          {% if bumdes.file_surat_pengantar %}
+          <a href="{{ bumdes.file_surat_pengantar.url }}" class="doc-item">
+            <i class="bi bi-envelope"></i> Surat Pengantar
+          </a>
+          {% endif %}
+
+          {% if bumdes.file_berita_acara %}
+          <a href="{{ bumdes.file_berita_acara.url }}" class="doc-item">
+            <i class="bi bi-journal"></i> Berita Acara
+          </a>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIWAYAT -->
+    <div class="col-md-12">
+      <div class="info-card">
+        <div class="card-header-custom">
+          <i class="bi bi-clock"></i> Riwayat
+        </div>
+        <div class="card-body-custom">
+          <div class="data-row">
+            <span class="label-text">Diajukan Oleh</span>
+            <span class="value-text">{{ bumdes.diajukan_oleh|default:"-" }}</span>
+          </div>
+          <div class="data-row">
+            <span class="label-text">Tanggal Ajukan</span>
+            <span class="value-text">{{ bumdes.tanggal_diajukan|date:"d M Y H:i" }}</span>
+          </div>
+          <div class="data-row">
+            <span class="label-text">Verifikasi</span>
+            <span class="value-text">{{ bumdes.tanggal_verifikasi|date:"d M Y H:i"|default:"-" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER ACTION -->
+<div class="footer-actions">
+  <div class="container d-flex justify-content-between">
+    <a href="{% url 'bumdes_list' %}" class="btn btn-outline-secondary">
+      Kembali
+    </a>
+
+    {% if bumdes.status == 'draft' or bumdes.status == 'ditolak' %}
+    <div class="d-flex gap-2">
+      <a href="{% url 'bumdes_edit' bumdes.pk %}" class="btn btn-outline-primary">
+        Edit
+      </a>
+      <form method="POST" action="{% url 'bumdes_submit' bumdes.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-primary">
+          Ajukan
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

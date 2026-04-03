@@ -1,0 +1,396 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+{% block page_title %}Ketahanan Pangan — Monitoring Kecamatan{% endblock %}
+
+{% block content %}
+<style>
+    /* ===== THEME ADAPTATION (AMBER/ORANGE) ===== */
+    :root {
+        --pangan-primary: #f59e0b; 
+        --pangan-bg-light: #fffbeb;    
+        --pangan-border: #fef3c7;  
+        --pangan-text: #92400e;      
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--pangan-border);
+    }
+    .page-header h4 { font-weight: 800; color: #1e293b; margin: 0; }
+    .page-header p { font-size: 13px; color: var(--text-muted); margin: 5px 0 0 0; }
+
+    /* ===== GRID SYSTEM ===== */
+    .filter-card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ===== MODERN CARDS (SAME AS INFRA) ===== */
+    .card-item {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        border-radius: 16px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        background: #ffffff;
+        border: 1px solid var(--pangan-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 110px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-item:hover {
+        transform: translateY(-5px);
+        border-color: var(--pangan-primary);
+        box-shadow: var(--shadow-md);
+        background: var(--pangan-bg-light);
+    }
+
+    .card-item.active {
+        background: var(--pangan-primary);
+        border-color: var(--pangan-primary);
+        box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.2);
+    }
+
+    .card-item small { 
+        z-index: 2;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--pangan-primary);
+        font-size: 0.65rem; 
+        margin-bottom: 6px;
+    }
+
+    .card-item span { 
+        z-index: 2;
+        font-weight: 800; 
+        font-size: 1.15rem; 
+        color: #1e293b;
+        line-height: 1.2;
+    }
+
+    .card-item.active small, .card-item.active span, .card-item.active .card-info-extra { 
+        color: #ffffff; 
+    }
+
+    .card-info-extra {
+        z-index: 2;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Ikon Dekoratif */
+    .card-icon-bg {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        color: var(--pangan-primary);
+        opacity: 0.05;
+        transform: rotate(-15deg);
+        transition: 0.4s;
+    }
+
+    .card-item:hover .card-icon-bg {
+        opacity: 0.1;
+        transform: rotate(0deg) scale(1.1);
+    }
+
+    .card-item.active .card-icon-bg {
+        color: #ffffff;
+        opacity: 0.2;
+    }
+
+    /* ===== NAVIGATION & FILTERS ===== */
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        background: #fff;
+        border: 1px solid var(--pangan-border);
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--pangan-primary);
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+        gap: 8px;
+    }
+    .btn-back:hover { background: var(--pangan-bg-light); border-color: var(--pangan-primary); }
+
+    .filter-pill {
+        padding: 8px 18px;
+        border-radius: 25px;
+        border: 1px solid var(--pangan-border);
+        background: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .filter-pill.active-status {
+        background: var(--pangan-primary);
+        color: #fff;
+        border-color: var(--pangan-primary);
+    }
+
+    /* ===== TABLE STYLING ===== */
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--pangan-border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table-card-header {
+        padding: 1.25rem;
+        background: #fafafa;
+        border-bottom: 1px solid var(--pangan-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .badge-diajukan { background: #fffbeb; color: #92400e; }
+    .badge-disetujui { background: #dcfce7; color: #15803d; }
+    .badge-ditolak { background: #fee2e2; color: #b91c1c; }
+
+    .btn-action {
+        background: #f8fafc; color: var(--pangan-primary);
+        width: 34px; height: 34px; border-radius: 10px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: 0.2s; border: 1px solid #e2e8f0; text-decoration: none;
+    }
+    .btn-action:hover { background: var(--pangan-primary); color: #fff; }
+</style>
+
+<div class="page-header">
+    <h4>Monitoring Ketahanan Pangan</h4>
+    <p>Verifikasi pengadaan bibit, ternak, dan sarana prasarana pangan desa.</p>
+</div>
+
+<div id="backButton" style="display:none;">
+    <div class="btn-back" onclick="resetFilter()">
+        <i class="bi bi-arrow-left"></i> Ganti Filter
+    </div>
+</div>
+
+<div id="yearSelection">
+    <p class="fw-bold text-muted small mb-3">PILIH TAHUN ANGGARAN</p>
+    <div class="filter-card-container">
+        {% for t in tahun_list %}
+        <div class="card-item" onclick="selectYear({{ t }})" data-tahun="{{ t }}">
+            <small>Data Tahun</small>
+            <span>{{ t }}</span>
+            <i class="bi bi-calendar-check card-icon-bg" style="font-size: 4rem;"></i>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="desaSelection" style="display:none;">
+    <p class="fw-bold text-muted small mb-3">PILIH DESA PELAKSANA</p>
+    <div class="filter-card-container">
+        {% for desa in desa_list %}
+        <div class="card-item" onclick="selectDesa({{ desa.pk }}, '{{ desa.nama|escapejs }}')" data-desa="{{ desa.pk }}">
+            <small>Wilayah Desa</small>
+            <span>{{ desa.nama }}</span>
+            <div class="card-info-extra">
+                <i class="bi bi-patch-check"></i> Program Ketapang
+            </div>
+            <i class="bi bi-egg-fried card-icon-bg" style="font-size: 4.5rem;"></i>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="dataContainer" style="display:none;">
+    <div class="status-pill-container d-flex gap-2 mb-3">
+        <button onclick="filterByStatus(this, '')" class="filter-pill active-status">Semua Program</button>
+        <button onclick="filterByStatus(this, 'diajukan')" class="filter-pill">Menunggu (<span id="totalDiajukan">0</span>)</button>
+        <button onclick="filterByStatus(this, 'disetujui')" class="filter-pill">Disetujui (<span id="totalDisetujui">0</span>)</button>
+        <button onclick="filterByStatus(this, 'ditolak')" class="filter-pill">Ditolak (<span id="totalDitolak">0</span>)</button>
+    </div>
+
+    <div class="table-card">
+        <div class="table-card-header flex-wrap">
+            <div style="font-size: 15px; font-weight: 800; color: var(--pangan-primary); display: flex; align-items: center; gap: 10px;">
+                <i class="bi bi-list-stars"></i>
+                <span id="selectedDesa"></span> <span style="opacity:0.3;">/</span> <span id="selectedYear"></span>
+            </div>
+            
+            <div style="position: relative; width: 100%; max-width: 320px;">
+                <input type="text" id="tableSearch" onkeyup="searchTable()" placeholder="Cari nama program..." 
+                       class="form-control form-control-sm rounded-pill ps-5">
+                <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+            </div>
+        </div>
+        <div id="dataTable" class="table-responsive"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTolak" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:24px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold text-danger">Tolak Program Pangan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formTolak">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">Program: <strong id="modalNama"></strong></p>
+                    <textarea class="form-control" name="catatan_verifikasi" rows="4" required placeholder="Sebutkan alasan penolakan (contoh: Tidak sesuai peruntukan)..." style="border-radius: 12px;"></textarea>
+                    <input type="hidden" name="status" value="ditolak">
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4">Kirim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedTahun = null;
+let selectedDesaId = null;
+let currentStatus = '';
+
+function selectYear(tahun){
+    selectedTahun = tahun;
+    document.getElementById('yearSelection').style.display='none';
+    document.getElementById('desaSelection').style.display='grid';
+    document.getElementById('backButton').style.display='block';
+}
+
+function selectDesa(id, name){
+    selectedDesaId = id;
+    document.getElementById('selectedYear').innerText = selectedTahun;
+    document.getElementById('selectedDesa').innerText = name;
+    loadData();
+}
+
+function filterByStatus(btn, status){
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active-status'));
+    btn.classList.add('active-status');
+    currentStatus = status;
+    loadData();
+}
+
+function searchTable() {
+    let input = document.getElementById("tableSearch").value.toUpperCase();
+    let rows = document.querySelectorAll("#dataTable table tbody tr");
+    rows.forEach(row => { row.style.display = row.innerText.toUpperCase().includes(input) ? "" : "none"; });
+}
+
+function loadData(){
+    document.getElementById('dataContainer').style.display='none';
+    document.getElementById('desaSelection').style.display='none';
+
+    fetch("{% url 'ketahanan_pangan_filter_api' %}?tahun="+selectedTahun+"&desa_id="+selectedDesaId+"&status="+currentStatus)
+    .then(res=>res.json()).then(data=>{
+        document.getElementById('totalDiajukan').innerText = data.summary.total_diajukan;
+        document.getElementById('totalDisetujui').innerText = data.summary.total_disetujui;
+        document.getElementById('totalDitolak').innerText = data.summary.total_ditolak;
+        renderTable(data.data);
+        document.getElementById('dataContainer').style.display='block';
+    });
+}
+
+
+function renderTable(data){
+    if(data.length === 0){
+        document.getElementById('dataTable').innerHTML = `
+            <div style="padding:4rem 2rem; text-align:center; color:#94a3b8;">
+                <i class="bi bi-patch-exclamation" style="font-size:3rem; opacity:0.2;"></i>
+                <p style="font-weight:600; font-size:16px; mt-3">Belum ada data ketahanan pangan.</p>
+            </div>`;
+        return;
+    }
+
+    let html = `<table class="table mb-0">
+        <thead class="bg-light small fw-bold text-uppercase">
+            <tr>
+                <th class="ps-3" width="60">No</th>
+                <th>Nama Kelompok / Kegiatan</th>
+                <th>Tgl Diajukan</th>
+                <th>Status</th>
+                <th class="text-center">Aksi</th>
+            </tr>
+        </thead><tbody>`;
+
+    data.forEach((obj, i)=>{
+        // Menyesuaikan dengan views.py kamu:
+        // views.py mengirim 'nama_kelompok', bukan 'nama_kegiatan'
+        let judul = obj.nama_kelompok || "Tanpa Nama Kelompok";
+        let statusDisplay = obj.status_display || obj.status;
+
+        html+=`<tr>
+            <td class="ps-3 text-muted fw-bold">${i+1}</td>
+            <td>
+                <div class="fw-bold" style="color:#1e293b;">${judul}</div>
+                <small class="text-muted" style="font-size:11px;">
+                    <i class="bi bi-geo-alt"></i> Desa ${obj.desa_nama}
+                </small>
+            </td>
+            <td><span style="font-size:12px; color:#64748b;">${obj.tanggal_diajukan}</span></td>
+            <td><span class="badge badge-${obj.status}">${statusDisplay}</span></td>
+            <td class="text-center">
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="/ketahanan-pangan/kecamatan/${obj.pk}/" class="btn-action" title="Lihat Detail">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    
+                    ${obj.status === 'diajukan' ? `
+                    <form method="POST" action="/ketahanan-pangan/kecamatan/${obj.pk}/verifikasi/" class="m-0">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="disetujui">
+                        <button type="submit" class="btn-action text-success" title="Setujui" onclick="return confirm('Setujui kelompok ini?')">
+                            <i class="bi bi-check2"></i>
+                        </button>
+                    </form>
+                    <button class="btn-action text-danger" data-bs-toggle="modal" data-bs-target="#modalTolak" data-pk="${obj.pk}" data-nama="${judul}" title="Tolak">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    ` : ''}
+                </div>
+            </td>
+        </tr>`;
+    });
+
+    html+="</tbody></table>";
+    document.getElementById('dataTable').innerHTML = html;
+}
+
+function resetFilter(){
+    selectedTahun = null; selectedDesaId = null; currentStatus = '';
+    document.getElementById('yearSelection').style.display='block';
+    document.getElementById('desaSelection').style.display='none';
+    document.getElementById('dataContainer').style.display='none';
+    document.getElementById('backButton').style.display='none';
+}
+
+document.getElementById('modalTolak').addEventListener('show.bs.modal', function (e) {
+    const btn = e.relatedTarget;
+    document.getElementById('formTolak').action = `/ketahanan-pangan/kecamatan/${btn.getAttribute('data-pk')}/verifikasi/`;
+    document.getElementById('modalNama').textContent = btn.getAttribute('data-nama');
+});
+</script>
+{% endblock %}

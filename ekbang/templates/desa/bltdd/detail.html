@@ -1,0 +1,296 @@
+{% extends 'includes/base.html' %}
+{% block page_title %}Detail BLT Dana Desa{% endblock %}
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #f97316;
+        --primary-dark: #ea580c;
+        --primary-light: #fff7ed;
+        --bg-light: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+    }
+
+    /* ── Card Styling ── */
+    .form-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .form-section-title {
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+    }
+
+    /* ── Detail Label & Value ── */
+    .detail-label {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: 0.35rem;
+    }
+
+    .detail-value {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 1.05rem;
+    }
+
+    /* ── PERBAIKAN: Total Dana Box (Highlight Card) ── */
+    .total-dana-box {
+        background: linear-gradient(135deg, #fff 0%, var(--bg-light) 100%);
+        border: 2px dashed var(--primary); /* Memberikan kesan formal/sertifikat */
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .total-dana-box::after {
+        content: '💰'; /* Watermark tipis di pojok */
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2.5rem;
+        opacity: 0.05;
+    }
+
+    .total-label-highlight {
+        color: var(--primary-dark);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .total-amount-highlight {
+        color: var(--text-dark);
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+
+    /* ── Document Link Styling ── */
+    .doc-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--bg-light);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-dark);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .doc-link:hover {
+        background: #fff;
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.12);
+    }
+
+    .doc-icon {
+        font-size: 1.35rem;
+        color: var(--primary);
+    }
+
+    /* ── Status Timeline / History ── */
+    .history-item {
+        border-left: 2px solid var(--border-color);
+        padding-left: 1.5rem;
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+
+    .history-item:last-child {
+        padding-bottom: 0.5rem;
+    }
+
+    .history-item::before {
+        content: '';
+        position: absolute;
+        left: -7px;
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border: 2px solid var(--primary);
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    /* ── Alert Penolakan ── */
+    .alert-tolak {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        border-left: 4px solid #ef4444;
+        color: #991b1b;
+        padding: 1.25rem;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="mb-1">Detail Pengajuan BLT-DD</h4>
+        <p class="text-muted mb-0">Desa {{ obj.desa.nama }} — Tahun {{ obj.tahun_anggaran }}</p>
+    </div>
+    <div class="text-end">
+        <span class="badge badge-{{ obj.status }} px-3 py-2" style="font-size:13px; border-radius: 50px;">
+            {% if obj.status == 'draft' %}📝
+            {% elif obj.status == 'diajukan' %}⏳
+            {% elif obj.status == 'disetujui' %}✅
+            {% else %}❌{% endif %}
+            {{ obj.get_status_display }}
+        </span>
+    </div>
+</div>
+
+{% if obj.status == 'ditolak' and obj.catatan_verifikasi %}
+<div class="alert-tolak mb-4">
+    <div class="d-flex align-items-center gap-2 mb-1">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <strong style="font-size: 14px;">Catatan Penolakan Verifikator:</strong>
+    </div>
+    <p class="mb-0 small ms-4">{{ obj.catatan_verifikasi }}</p>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="bi bi-info-circle"></i> Informasi Utama SK
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="detail-label">Nomor Surat Keputusan (SK)</div>
+                    <div class="detail-value">{{ obj.nomor_sk }}</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Jumlah Keluarga Penerima Manfaat (KPM)</div>
+                    <div class="detail-value">{{ obj.jumlah_kpm }} KPM</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Nominal Per KPM (Per Bulan)</div>
+                    <div class="detail-value">Rp {{ obj.nominal_per_bulan|floatformat:0 }}</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Durasi Penerimaan</div>
+                    <div class="detail-value">{{ obj.jumlah_bulan }} Bulan</div>
+                </div>
+            </div>
+            
+            <div class="total-dana-box">
+    <span class="total-label-highlight">Total Dana Disalurkan</span>
+    <h2 class="total-amount-highlight">
+        <span style="font-size: 0,5rem; font-weight: 500; color: var(--primary);">Rp</span> 
+        {{ obj.jumlah_total_terima|floatformat:0 }}
+    </h2>
+</div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="bi bi-file-earmark-text"></i> Berkas Lampiran (Digital)
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="detail-label mb-2">File SK BLT</div>
+                    {% if obj.file_sk %}
+                    <a href="{{ obj.file_sk.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-file-pdf doc-icon"></i>
+                        <span class="small fw-bold text-truncate">Lihat SK</span>
+                    </a>
+                    {% else %}<span class="text-muted small">Tidak ada file</span>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-label mb-2">LPJ Sebelumnya</div>
+                    {% if obj.lpj_bulan_sebelumnya %}
+                    <a href="{{ obj.lpj_bulan_sebelumnya.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-file-earmark-check doc-icon"></i>
+                        <span class="small fw-bold text-truncate">Lihat LPJ</span>
+                    </a>
+                    {% else %}<span class="text-muted small">Tidak ada file</span>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-label mb-2">Berita Acara</div>
+                    {% if obj.file_berita_acara %}
+                    <a href="{{ obj.file_berita_acara.url }}" target="_blank" class="doc-link">
+                        <i class="bi bi-file-text doc-icon"></i>
+                        <span class="small fw-bold text-truncate">Lihat Berita Acara</span>
+                    </a>
+                    {% else %}<span class="text-muted small">Tidak ada file</span>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="bi bi-clock-history"></i> Log Pengajuan
+            </div>
+            
+            <div class="history-item">
+            <div class="detail-label">Penginput Data</div>
+            <div class="small fw-bold">
+                {% if obj.diajukan_oleh %}
+                    {# Jika ada user, tampilkan nama lengkap atau username #}
+                    {{ obj.diajukan_oleh.get_full_name|default:obj.diajukan_oleh.username }}
+                {% else %}
+                    {# Jika kosong (data dummy atau belum disubmit) #}
+                    <span class="text-muted italic">- Belum Ada Data -</span>
+                {% endif %}
+            </div>
+            <div class="text-muted" style="font-size: 11px;">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ obj.tanggal_diajukan|date:"d M Y, H:i"|default:"Belum diajukan" }}
+            </div>
+</div>
+
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-2">
+    <a href="{% url 'bltdd_list' %}" class="btn btn-light border px-4">
+        <i class="bi bi-arrow-left me-2"></i>Kembali
+    </a>
+    
+    <div class="gap-2 d-flex">
+        {% if obj.status == 'draft' or obj.status == 'ditolak' %}
+        <form method="POST" action="{% url 'bltdd_submit' obj.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary px-4" onclick="return confirm('Kirimkan data ini untuk diverifikasi?')">
+                <i class="bi bi-send-fill me-2"></i>Ajukan Sekarang
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

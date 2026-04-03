@@ -1,0 +1,121 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ... (Style tetap sama, gue ringkas biar fokus ke logic field) ... */
+    .document-wrapper { background-color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; font-family: 'Segoe UI', sans-serif; padding-top: 40px; padding-bottom: 100px; }
+    .paper { width: 100%; max-width: 800px; padding: 40px; position: relative; color: #334155; }
+    .verif-title { border-bottom: 2px solid #e2e8f0; margin-bottom: 30px; padding-bottom: 15px; }
+    .verif-title h4 { font-weight: 800; margin: 0; color: #1e293b; }
+    .section-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-top: 25px; margin-bottom: 15px; letter-spacing: 1px; }
+    .data-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #f1f5f9; }
+    .data-item label { display: block; font-size: 0.85rem; color: #64748b; margin-bottom: 4px; }
+    .data-item span { display: block; font-size: 1.1rem; font-weight: 600; color: #0f172a; }
+    .doc-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; }
+    .btn-unduh { text-decoration: none; background: #f1f5f9; color: #475569; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .status-badge { position: absolute; top: 40px; right: 40px; padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
+    .status-diajukan { background: #fef3c7; color: #92400e; }
+    .status-disetujui { background: #dcfce7; color: #166534; }
+    .action-bar { position: fixed; bottom: 30px; background: #1e293b; padding: 12px 25px; border-radius: 50px; display: flex; gap: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+</style>
+
+<div class="document-wrapper">
+    <div class="nav-back" style="width: 100%; max-width: 800px; margin-bottom: 15px;">
+        <a href="{% url 'bltdd_list_kecamatan' %}" class="text-decoration-none text-muted fw-bold small">
+            <i class="bi bi-chevron-left"></i> KEMBALI KE DAFTAR
+        </a>
+    </div>
+
+    <div class="paper">
+        <div class="status-badge {% if obj.status == 'diajukan' %}status-diajukan{% else %}status-disetujui{% endif %}">
+            {{ obj.get_status_display }}
+        </div>
+
+        <div class="verif-title">
+            <h4>Verifikasi Penyaluran BLT-DD</h4>
+            <p>ID Pengajuan: #{{ obj.id }} &bull; TA {{ obj.tahun_anggaran }}</p>
+        </div>
+
+       <div class="section-label">Informasi Wilayah & Pengajuan</div>
+        <div class="data-grid">
+            <div class="data-item">
+                <label>Desa</label>
+                <span>{{ obj.desa.nama }}</span>
+            </div>
+            <div class="data-item">
+                <label>Kecamatan</label>
+                <span>{{ obj.desa.kecamatan }}</span>
+            </div>
+            <div class="data-item">
+                <label>Tahun Anggaran</label>
+                <span>{{ obj.tahun_anggaran }}</span>
+            </div>
+            <div class="data-item">
+                <label>Nomor SK Penetapan</label>
+                <span>{{ obj.nomor_sk|default:"—" }}</span>
+            </div>
+            <div class="data-item">
+                <label>Jumlah KPM</label>
+                <span>{{ obj.jumlah_kpm }} KK</span>
+            </div>
+            <div class="data-item">
+                <label>Total Anggaran</label>
+                <span>Rp {{ obj.jumlah_total_terima|floatformat:0 }}</span>
+            </div>
+        </div>
+
+        <div class="section-label">Dokumen Lampiran (Sesuai Database)</div>
+        <div class="doc-list">
+            
+            <div class="doc-item">
+                <div>
+                    <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                    <span class="fw-bold">SK Penerima BLT</span>
+                </div>
+                {% if obj.file_sk %}
+                    <a href="{{ obj.file_sk.url }}" class="btn-unduh" target="_blank">Lihat/Unduh</a>
+                {% else %}
+                    <span class="text-muted small italic">File SK Kosong</span>
+                {% endif %}
+            </div>
+
+            <div class="doc-item">
+                <div>
+                    <i class="bi bi-file-earmark-check text-primary me-2"></i>
+                    <span class="fw-bold">LPJ Bulan Sebelumnya</span>
+                </div>
+                {% if obj.lpj_bulan_sebelumnya %}
+                    <a href="{{ obj.lpj_bulan_sebelumnya.url }}" class="btn-unduh" target="_blank">Lihat/Unduh</a>
+                {% else %}
+                    <span class="text-muted small italic">File LPJ Kosong</span>
+                {% endif %}
+            </div>
+
+            <div class="doc-item">
+                <div>
+                    <i class="bi bi-file-earmark-text text-success me-2"></i>
+                    <span class="fw-bold">Berita Acara / Pengantar</span>
+                </div>
+                {% if obj.file_berita_acara %}
+                    <a href="{{ obj.file_berita_acara.url }}" class="btn-unduh" target="_blank">Lihat/Unduh</a>
+                {% else %}
+                    <span class="text-muted small italic">File Berita Acara Kosong</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        {% if obj.status == 'diajukan' %}
+        <form method="POST" action="{% url 'bltdd_verifikasi' obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="disetujui">
+            <button type="submit" class="btn btn-success btn-sm fw-bold px-3 rounded-pill">Setujui</button>
+        </form>
+        <button class="btn btn-outline-light btn-sm fw-bold px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#modalTolak">Tolak</button>
+        {% endif %}
+        <button onclick="window.print()" class="btn btn-secondary btn-sm fw-bold px-3 rounded-pill">Cetak PDF</button>
+    </div>
+</div>
+{% endblock %}
