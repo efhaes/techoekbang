@@ -1,0 +1,355 @@
+/* =====================================================
+   BUMDES KECAMATAN — Monitoring Page
+   synced with emerald green palette
+===================================================== */
+
+/* ── Page Header ── */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h4 {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+/* ── Back Button ── */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 1.25rem;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+}
+
+.btn-back:hover {
+  background: var(--bg);
+  border-color: var(--primary);
+  transform: translateX(-3px);
+}
+
+/* ── Filter Card Container ── */
+.filter-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* ── Card Item (Tahun & Desa) ── */
+.card-item {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 1.25rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-item small {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-item span {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.card-item:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-item.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(5,150,105,0.30);
+}
+
+.card-item.active small,
+.card-item.active span,
+.card-item.active .card-info-extra {
+  color: rgba(255,255,255,0.85);
+}
+
+.card-item.active span {
+  color: #fff;
+}
+
+/* Background decorative icon */
+.card-icon-bg {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  opacity: 0.06;
+  color: var(--primary);
+  pointer-events: none;
+}
+
+.card-item.active .card-icon-bg {
+  opacity: 0.15;
+  color: #fff;
+}
+
+/* Extra info on desa card */
+.card-info-extra {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 6px;
+}
+
+/* ── Status Filter Pills ── */
+.status-pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.filter-pill {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--bg);
+}
+
+.filter-pill.active-status {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(5,150,105,0.25);
+}
+
+/* ── Table Card ── */
+.table-card {
+  background: var(--card);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.table-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--bg);
+}
+
+/* Search input inside table header */
+.table-card-header input[type="text"] {
+  border-radius: 12px !important;
+  border: 1.5px solid var(--border) !important;
+  background: var(--card) !important;
+  font-size: 13px !important;
+  transition: all 0.2s;
+}
+
+.table-card-header input[type="text"]:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(5,150,105,0.10) !important;
+  outline: none !important;
+}
+
+/* ── Table ── */
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background: #f8fafc;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  transition: background 0.15s;
+}
+
+.table tbody tr:hover {
+  background-color: var(--bg);
+}
+
+.table tbody td {
+  padding: 1rem 1.25rem;
+  vertical-align: middle;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f0fdf4;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Badge Status ── */
+.badge {
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.badge-draft     { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+.badge-diajukan  { background: #fffbeb; color: #b45309; border: 1px solid #fef3c7; }
+.badge-disetujui { background: var(--bg); color: var(--primary-dark); border: 1px solid var(--border); }
+.badge-ditolak   { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+
+/* ── Action Buttons ── */
+.btn-action {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-action:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5,150,105,0.25);
+}
+
+.btn-action.danger:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239,68,68,0.25);
+}
+
+/* ── Skeleton Loading ── */
+.skeleton {
+  background: linear-gradient(90deg, #f0fdf4 25%, #d1fae5 50%, #f0fdf4 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 10px;
+  height: 20px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Modal ── */
+.modal-content {
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-weight: 800;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body textarea.form-control {
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.modal-body textarea.form-control:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.10);
+}
+
+.modal-footer {
+  border-top: none;
+  padding: 1rem 1.5rem;
+}
+
+/* ── Empty State ── */
+#dataTable [style*="text-align:center"] {
+  color: var(--text-muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .filter-card-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .table-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-card-header > div:last-child {
+    width: 100%;
+    max-width: 100% !important;
+  }
+
+  .status-pill-container {
+    gap: 6px;
+  }
+}

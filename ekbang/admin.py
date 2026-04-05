@@ -6,11 +6,38 @@ from .models import *
 # USER PROFILE
 # ─────────────────────────────────────────
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'role', 'desa')
-    list_filter = ('role',)
-    search_fields = ('user__username',)
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from .models import UserProfile
+
+# 1. Buat class Inline
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = 'Informasi Profil & Desa'
+
+    # Menentukan field mana yang muncul di dalam halaman User
+    fields = ('role', 'desa', 'is_email_verified')
+
+# 2. Definisikan ulang UserAdmin bawaan Django
+class UserAdmin(BaseUserAdmin):
+    inlines = (UserProfileInline,)
+    
+    # Tambahkan kolom role dan desa di daftar User utama
+    list_display = ('username', 'email', 'get_role', 'get_desa', 'is_active', 'is_staff')
+
+    def get_role(self, obj):
+        return obj.profile.role if hasattr(obj, 'profile') else '-'
+    get_role.short_description = 'Role'
+
+    def get_desa(self, obj):
+        return obj.profile.desa if hasattr(obj, 'profile') else '-'
+    get_desa.short_description = 'Desa'
+
+# 3. Unregister User lama, Register User baru
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 
 # ─────────────────────────────────────────

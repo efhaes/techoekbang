@@ -29,22 +29,22 @@
 
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #f8fafc;
+  background-color: #f0fdf4;
   color: var(--text);
   margin: 0;
 }
 
 
-/* ===== SIDEBAR MODERN ===== */
-/* SIDEBAR */
+/* ===== SIDEBAR ===== */
 #sidebar {
   width: var(--sidebar-w);
-  min-height: 100vh;
+  height: 100vh;          /* ← ganti min-height jadi height */
   background: #f8fafc;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   position: fixed;
+  overflow: hidden;       /* ← tambah ini */
 }
 
 /* BRAND */
@@ -86,7 +86,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #10b981;
+  background: var(--primary);
   color: #fff;
   font-weight: bold;
   display: flex;
@@ -98,6 +98,26 @@ body {
 .sidebar-nav {
   flex: 1;
   padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;          /* ← tambah ini, penting agar flex child bisa scroll */
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 .nav-label {
@@ -129,87 +149,89 @@ body {
   transition: all 0.3s ease;
 }
 
-/* EFFECT UMUM HOVER */
+/* EFFECT HOVER */
 .nav-item:hover {
   transform: translateX(6px) scale(1.02);
 }
 
 /* DASHBOARD */
 .menu-dashboard:hover {
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
-  color: #4f46e5;
-  box-shadow: 0 10px 25px rgba(79,70,229,0.25);
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  color: var(--primary-dark);
+  box-shadow: 0 10px 25px rgba(5,150,105,0.20);
 }
 .menu-dashboard:hover i {
-  color: #4f46e5;
+  color: var(--primary-dark);
   transform: scale(1.3) rotate(-5deg);
 }
 
 /* BUMDES */
 .menu-bumdes:hover {
-  background: linear-gradient(135deg, #faf5ff, #f3e8ff);
-  color: #a855f7;
-  box-shadow: 0 10px 25px rgba(168,85,247,0.25);
+  background: linear-gradient(135deg, #f0fdf4, #bbf7d0);
+  color: #047857;
+  box-shadow: 0 10px 25px rgba(4,120,87,0.20);
 }
 .menu-bumdes:hover i {
-  color: #a855f7;
+  color: #047857;
   transform: scale(1.3) rotate(-5deg);
 }
 
 /* BLT */
 .menu-blt:hover {
-  background: linear-gradient(135deg, #fff7ed, #ffedd5);
-  color: #f97316;
-  box-shadow: 0 10px 25px rgba(249,115,22,0.25);
+  background: linear-gradient(135deg, #ecfdf5, #a7f3d0);
+  color: #065f46;
+  box-shadow: 0 10px 25px rgba(6,95,70,0.20);
 }
 .menu-blt:hover i {
-  color: #f97316;
+  color: #065f46;
   transform: scale(1.3) rotate(-5deg);
 }
 
 /* INFRA */
 .menu-infra:hover {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-  color: #0ea5e9;
-  box-shadow: 0 10px 25px rgba(14,165,233,0.25);
+  background: linear-gradient(135deg, #f0fdf4, #6ee7b7);
+  color: #059669;
+  box-shadow: 0 10px 25px rgba(5,150,105,0.22);
 }
 .menu-infra:hover i {
-  color: #0ea5e9;
+  color: #059669;
   transform: scale(1.3) rotate(-5deg);
 }
 
 /* KOPERASI */
 .menu-koperasi:hover {
-  background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
-  color: #14b8a6;
-  box-shadow: 0 10px 25px rgba(20,184,166,0.25);
+  background: linear-gradient(135deg, #ecfdf5, #34d399);
+  color: #047857;
+  box-shadow: 0 10px 25px rgba(52,211,153,0.25);
 }
 .menu-koperasi:hover i {
-  color: #14b8a6;
+  color: #047857;
   transform: scale(1.3) rotate(-5deg);
 }
 
 /* KETAHANAN */
 .menu-ketahanan:hover {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  color: #22c55e;
-  box-shadow: 0 10px 25px rgba(34,197,94,0.25);
+  background: linear-gradient(135deg, #f0fdf4, #bbf7d0);
+  color: #065f46;
+  box-shadow: 0 10px 25px rgba(6,95,70,0.20);
 }
 .menu-ketahanan:hover i {
-  color: #22c55e;
+  color: #065f46;
   transform: scale(1.3) rotate(-5deg);
 }
 
 /* TEMPLATE */
 .menu-template:hover {
-  background: linear-gradient(135deg, #fef2f2, #fee2e2);
-  color: #ef4444;
-  box-shadow: 0 10px 25px rgba(239,68,68,0.25);
+  background: linear-gradient(135deg, #ecfdf5, #a7f3d0);
+  color: var(--primary-dark);
+  box-shadow: 0 10px 25px rgba(4,120,87,0.20);
 }
 .menu-template:hover i {
-  color: #ef4444;
+  color: var(--primary-dark);
   transform: scale(1.3) rotate(-5deg);
 }
+
+/* SHIMMER EFFECT */
 .nav-item::before {
   content: "";
   position: absolute;
@@ -225,68 +247,59 @@ body {
   left: 100%;
 }
 
-/* ACTIVE */
+/* ===== ACTIVE STATES ===== */
 .menu-dashboard.active {
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: #fff;
-  box-shadow: 0 8px 20px rgba(79,70,229,0.3);
+  box-shadow: 0 8px 20px rgba(5,150,105,0.30);
 }
 
 .menu-bumdes.active {
-  background: linear-gradient(135deg, #a855f7, #c084fc);
+  background: linear-gradient(135deg, #047857, #059669);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(168,85,247,0.3);
+  box-shadow: 0 8px 20px rgba(4,120,87,0.30);
 }
 
 .menu-blt.active {
-  background: linear-gradient(135deg, #f97316, #fb923c);
+  background: linear-gradient(135deg, #065f46, #047857);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(249,115,22,0.3);
+  box-shadow: 0 8px 20px rgba(6,95,70,0.30);
 }
 
 .menu-infra.active {
-  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  background: linear-gradient(135deg, #059669, #10b981);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(14,165,233,0.3);
+  box-shadow: 0 8px 20px rgba(5,150,105,0.30);
 }
 
 .menu-koperasi.active {
-  background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+  background: linear-gradient(135deg, #10b981, #34d399);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(20,184,166,0.3);
+  box-shadow: 0 8px 20px rgba(16,185,129,0.30);
 }
 
 .menu-ketahanan.active {
-  background: linear-gradient(135deg, #22c55e, #4ade80);
+  background: linear-gradient(135deg, #047857, #10b981);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(34,197,94,0.3);
+  box-shadow: 0 8px 20px rgba(4,120,87,0.30);
 }
 
 .menu-template.active {
-  background: linear-gradient(135deg, #ef4444, #f87171);
+  background: linear-gradient(135deg, #064e3b, #047857);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(239,68,68,0.3);
+  box-shadow: 0 8px 20px rgba(6,78,59,0.30);
 }
 
-/* ICON */
-.nav-item i {
-  font-size: 18px;
-  transition: all 0.3s ease;
-}
+/* ===== ICON WARNA DEFAULT ===== */
+.menu-dashboard  { color: var(--primary); }
+.menu-bumdes     { color: #047857; }
+.menu-blt        { color: #065f46; }
+.menu-infra      { color: var(--primary); }
+.menu-koperasi   { color: var(--primary-light); }
+.menu-ketahanan  { color: #059669; }
+.menu-template   { color: var(--primary-dark); }
 
-.menu-dashboard  { color: #4f46e5; }
-.menu-bumdes { color: #a855f7; }
-.menu-blt  { color: #f97316; }
-.menu-infra { color: #0ea5e9; }
-.menu-koperasi  { color: #14b8a6; }
-.menu-ketahanan  { color: #22c55e; }
-.menu-template  { color: #ef4444; }
-/* WARNA PER MENU */
-
-
-
-
-/* ANIMASI ICON */
+/* ===== ANIMASI ICON ===== */
 @keyframes shake {
   0%   { transform: scale(1) rotate(0deg); }
   25%  { transform: scale(1.2) rotate(-10deg); }
@@ -295,7 +308,6 @@ body {
   100% { transform: scale(1.15) rotate(0deg); }
 }
 
-/* HOVER ICON */
 .nav-item:hover i {
   animation: shake 0.4s ease;
   transform: scale(1.2);
@@ -304,11 +316,11 @@ body {
 /* LOGOUT */
 form .nav-item {
   margin: 10px;
-  color: #ef4444;
+  color: #dc2626;
 }
 
 form .nav-item:hover {
-  background: #fee2e2;
+  background:#ff0000;
 }
 
 /* =======================
@@ -324,7 +336,7 @@ form .nav-item:hover {
 }
 
 /* =======================
-   TOPBAR (GLOBAL)
+   TOPBAR
 ======================= */
 #topbar {
   height: var(--topbar-h);
@@ -375,7 +387,7 @@ form .nav-item:hover {
 }
 
 /* =======================
-   ALERT (MESSAGES DJANGO)
+   ALERT
 ======================= */
 .alert {
   border-radius: 10px;
@@ -383,7 +395,7 @@ form .nav-item:hover {
 }
 
 /* =======================
-   NOTIFICATION (GLOBAL)
+   TOPBAR BUTTON / NOTIF
 ======================= */
 .topbar-btn {
   width: 36px;
@@ -399,7 +411,7 @@ form .nav-item:hover {
 .notif-dot {
   width: 8px;
   height: 8px;
-  background: red;
+  background: #dc2626;
   border-radius: 50%;
   position: absolute;
   top: 5px;
@@ -412,7 +424,11 @@ form .nav-item:hover {
 .sidebar-collapsed #sidebar {
   width: 60px;
 }
-
+/* User: sembunyikan nama, hanya avatar */
+.sidebar-collapsed .sidebar-user {
+  justify-content: center;
+  padding: 20px 0;
+}
 .sidebar-collapsed #content-wrapper {
   margin-left: 60px;
 }
@@ -420,7 +436,8 @@ form .nav-item:hover {
 .sidebar-collapsed .brand-text,
 .sidebar-collapsed .user-name,
 .sidebar-collapsed .user-role,
-.sidebar-collapsed .nav-item span {
+.sidebar-collapsed .nav-item span,
+.sidebar-collapsed .nav-label { 
   display: none;
 }
 
@@ -428,7 +445,6 @@ form .nav-item:hover {
    RESPONSIVE
 ======================= */
 @media (max-width: 768px) {
-
   #sidebar {
     transform: translateX(-100%);
   }

@@ -6,6 +6,8 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Count, Q
 import datetime
+from django.shortcuts import get_object_or_404 
+from django.contrib.auth.models import User
 # Tambahkan ini di deretan import paling atas
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -14,7 +16,17 @@ from ekbang.models import UserProfile # Menambahkan UserProfile ke import models
 from ekbang.models import Bumdes, BLTDD, Infrastruktur, Koperasi, KetahananPangan, Desa
 from ekbang.forms.auth import LoginForm, BuatAkunDesaForm, DesaForm
 from ekbang.decorators import kecamatan_required
-
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.db import transaction
+import uuid
+from django.utils import timezone
+from datetime import timedelta
 # ─────────────────────────────────────────
 # HELPER
 # ─────────────────────────────────────────
@@ -60,15 +72,233 @@ def logout_view(request):
         logout(request)
     return redirect('login')
 
+
 @login_required
 @kecamatan_required
 def buat_akun_desa(request):
     form = BuatAkunDesaForm(request.POST or None)
+
     if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, "Akun desa berhasil dibuat.")
-        return redirect('buat_akun_desa')
+        try:
+            with transaction.atomic():
+
+                # 1. Simpan User
+                user = form.save(commit=False)
+                user.set_password(form.cleaned_data['password'])
+                user.is_active = False 
+                user.save()
+
+                # 2. Simpan Profile
+                profile, created = UserProfile.objects.get_or_create(user=user)
+                profile.role = 'admin_desa'
+                profile.desa = form.cleaned_data.get('desa')
+                profile.is_email_verified = False
+
+                # 🔥 GENERATE TOKEN BARU
+                profile.email_verification_token = uuid.uuid4()
+                profile.token_created_at = timezone.now()
+
+                profile.save()
+
+                # 3. Link verifikasi
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+                verify_url = request.build_absolute_uri(
+                    reverse('verifikasi_email', kwargs={
+                        'uidb64': uid,
+                        'token': str(profile.email_verification_token)
+                    })
+                )
+
+                # 4. Kirim email
+                context = {'user': user, 'verify_url': verify_url}
+                html_content = render_to_string('emails/verifikasi_email_template.html', context)
+
+                email = EmailMultiAlternatives(
+                    subject='Aktivasi Akun Desa - Admin Eksbang',
+                    body=strip_tags(html_content),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[user.email],
+                )
+                email.attach_alternative(html_content, "text/html")
+                email.send(fail_silently=False)
+
+            messages.success(request, f"Akun desa berhasil dibuat. Silakan verifikasi email {user.email}")
+            return redirect('buat_akun_desa')
+
+        except Exception as e:
+            messages.error(request, f"Gagal mengirim email verifikasi: {str(e)}")
+
     return render(request, 'auth/buat_akun_desa.html', {'form': form})
+
+def verifikasi_email(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        profile = user.profile
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if not user:
+        messages.error(request, "User tidak ditemukan.")
+        return redirect('login')
+
+    # 🔥 CASE 1: TOKEN SAMA
+    if str(profile.email_verification_token) == token:
+
+        # 🔥 CEK EXPIRED
+        if profile.token_created_at and timezone.now() > profile.token_created_at + timedelta(seconds=30):
+            messages.error(request, "Maaf, link verifikasi anda sudah kadaluarsa.")
+            return redirect('login')
+
+        # ✅ VALID
+        if user.is_active:
+            messages.info(request, "Akun sudah aktif sebelumnya.")
+        else:
+            user.is_active = True
+            profile.is_email_verified = True
+
+            # invalidate token
+            profile.email_verification_token = None
+            profile.token_created_at = None
+
+            user.save()
+            profile.save()
+
+            messages.success(request, "Email berhasil diverifikasi!")
+
+        return redirect('login')
+
+    else:
+        # 🔥 CASE 2: TOKEN BERBEDA (kemungkinan link lama)
+        if profile.email_verification_token:
+            messages.error(request, "Maaf, link verifikasi ini sudah tidak berlaku. Silakan gunakan link terbaru dari email.")
+
+        else:
+            messages.error(request, "Link verifikasi tidak valid.")
+
+        return redirect('login')
+
+
+# Pastikan ini di-import di atas
+
+@login_required
+@kecamatan_required
+def akun_desa_list(request):
+    # Mengambil semua user yang memiliki role 'admin_desa' melalui UserProfile
+    # Kita gunakan select_related agar query lebih efisien (tidak N+1)
+    users_desa = User.objects.filter(profile__role='admin_desa').select_related('profile', 'profile__desa')
+    
+    return render(request, 'auth/akun_desa_list.html', {'users_desa': users_desa})
+
+@login_required
+@kecamatan_required
+def edit_akun_desa(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    
+    if request.method == 'POST':
+        form = BuatAkunDesaForm(request.POST, instance=user)
+
+        # password opsional
+        form.fields['password'].required = False
+        form.fields['konfirmasi_password'].required = False
+
+        if form.is_valid():
+            with transaction.atomic():
+                updated_user = form.save(commit=False)
+
+                # 🔥 HANDLE PASSWORD
+                password = form.cleaned_data.get('password')
+                konfirmasi = form.cleaned_data.get('konfirmasi_password')
+
+                if password:
+                    if password != konfirmasi:
+                        messages.error(request, "Password dan konfirmasi tidak sama.")
+                        return redirect(request.path)
+
+                    updated_user.set_password(password)
+
+                updated_user.save()
+
+                # update profile
+                profile = updated_user.profile
+                profile.desa = form.cleaned_data.get('desa')
+                profile.save()
+            
+            messages.success(request, f"Data akun {updated_user.username} berhasil diperbarui.")
+            return redirect('akun_desa_list')
+
+    else:
+        form = BuatAkunDesaForm(
+            instance=user,
+            initial={'desa': user.profile.desa}
+        )
+
+        # password gak wajib diisi
+        form.fields['password'].required = False
+        form.fields['konfirmasi_password'].required = False
+            
+    return render(request, 'auth/edit_akun_desa.html', {
+        'form': form,
+        'user_edit': user
+    })
+
+@login_required
+@kecamatan_required
+def hapus_akun_desa(request, user_id):
+    if request.method == 'POST':
+        user = get_object_or_404(User, pk=user_id)
+        username = user.username
+        user.delete() # Ini otomatis menghapus UserProfile karena on_delete=CASCADE
+        messages.success(request, f"Akun {username} berhasil dihapus.")
+    return redirect('akun_desa_list')
+
+@login_required
+@kecamatan_required
+def kirim_ulang_verifikasi(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+
+    if user.is_active:
+        messages.info(request, f"Akun {user.username} sudah aktif.")
+        return redirect('akun_desa_list')
+
+    try:
+        with transaction.atomic():
+            profile = user.profile
+
+            # 🔥 GENERATE TOKEN BARU (INI YANG BENER)
+            profile.email_verification_token = uuid.uuid4()
+            profile.token_created_at = timezone.now()
+            profile.save()
+
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            verify_url = request.build_absolute_uri(
+                reverse('verifikasi_email', kwargs={
+                    'uidb64': uid,
+                    'token': str(profile.email_verification_token)
+                })
+            )
+
+            context = {'user': user, 'verify_url': verify_url}
+            html_content = render_to_string('emails/verifikasi_email_template.html', context)
+
+            email = EmailMultiAlternatives(
+                subject='Kirim Ulang: Aktivasi Akun Desa',
+                body=strip_tags(html_content),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[user.email],
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+        messages.success(request, f"Link verifikasi baru telah dikirim ke {user.email}")
+
+    except Exception as e:
+        messages.error(request, f"Gagal mengirim email: {str(e)}")
+
+    return redirect('akun_desa_list')
+
 
 @login_required
 @kecamatan_required
@@ -87,30 +317,139 @@ def desa_create(request):
 @login_required
 @kecamatan_required
 def dashboard_kecamatan(request):
+    tahun_ini = datetime.date.today().year
+    tahun     = int(request.GET.get('tahun', tahun_ini))
+    desa_id   = request.GET.get('desa')
+
+    # ── Base querysets per tahun ──
+    qs_bumdes   = Bumdes.objects.filter(tahun_anggaran=tahun)
+    qs_blt      = BLTDD.objects.filter(tahun_anggaran=tahun)
+    qs_infra    = Infrastruktur.objects.filter(tahun_anggaran=tahun)
+    qs_koperasi = Koperasi.objects.filter(tahun_anggaran=tahun)
+    qs_pangan   = KetahananPangan.objects.filter(tahun_anggaran=tahun)
+
+    # ── Stat Cards ──
+    def agg(qs):
+        return qs.aggregate(
+            total     = Count('id'),
+            pending   = Count('id', filter=Q(status='diajukan')),
+            disetujui = Count('id', filter=Q(status='disetujui')),
+            ditolak   = Count('id', filter=Q(status='ditolak')),
+            draft     = Count('id', filter=Q(status='draft')),
+        )
+
     stats = {
-        'bumdes': Bumdes.objects.aggregate(total=Count('id'), pending=Count('id', filter=Q(status='diajukan'))),
-        'blt': BLTDD.objects.aggregate(total=Count('id'), pending=Count('id', filter=Q(status='diajukan'))),
-        'infra': Infrastruktur.objects.aggregate(total=Count('id'), pending=Count('id', filter=Q(status='diajukan'))),
-        'koperasi': Koperasi.objects.aggregate(total=Count('id'), pending=Count('id', filter=Q(status='diajukan'))),
-        'pangan': KetahananPangan.objects.aggregate(total=Count('id'), pending=Count('id', filter=Q(status='diajukan'))),
+        'bumdes'  : agg(qs_bumdes),
+        'blt'     : agg(qs_blt),
+        'infra'   : agg(qs_infra),
+        'koperasi': agg(qs_koperasi),
+        'pangan'  : agg(qs_pangan),
     }
 
-    total_pending_all = sum(item['pending'] for item in stats.values())
+    total_pending_all = sum(s['pending']   for s in stats.values())
+    total_disetujui   = sum(s['disetujui'] for s in stats.values())
+    total_ditolak     = sum(s['ditolak']   for s in stats.values())
+    total_draft       = sum(s['draft']     for s in stats.values())
+    total_semua       = sum(s['total']     for s in stats.values())
 
+    # ── Chart Bar: Sebaran per Desa (top 10) ──
     desa_qs = Desa.objects.annotate(
         jml_pengajuan=(
-            Count('bumdes', distinct=True) + 
-            Count('bltdd', distinct=True) + 
-            Count('infrastruktur', distinct=True)
+            Count('bumdes',          distinct=True) +
+            Count('bltdd',           distinct=True) +
+            Count('infrastruktur',   distinct=True) +
+            Count('koperasi',        distinct=True) +
+            Count('ketahananpangan', distinct=True)
         )
     ).order_by('-jml_pengajuan')[:10]
 
+    # ── Semua Desa ──
+    semua_desa = Desa.objects.all().order_by('nama')
+    total_desa = semua_desa.count()
+
+    # ── Tabel Rekap Status per Desa ──
+    rekap_desa = []
+    for desa in semua_desa:
+        def status_desa(qs):
+            obj = qs.filter(desa=desa).order_by('-created_at').first()
+            return obj.status if obj else None
+
+        bumdes_status   = status_desa(qs_bumdes)
+        blt_status      = status_desa(qs_blt)
+        infra_status    = status_desa(qs_infra)
+        koperasi_status = status_desa(qs_koperasi)
+        pangan_status   = status_desa(qs_pangan)
+
+        sudah_lapor = any([bumdes_status, blt_status, infra_status, koperasi_status, pangan_status])
+
+        rekap_desa.append({
+            'desa'       : desa,
+            'bumdes'     : bumdes_status,
+            'blt'        : blt_status,
+            'infra'      : infra_status,
+            'koperasi'   : koperasi_status,
+            'pangan'     : pangan_status,
+            'sudah_lapor': sudah_lapor,
+        })
+
+    # ── Progress Kepatuhan per Modul + desa_list ──
+    def hitung_kepatuhan(qs):
+        desa_sudah_ids = set(qs.values_list('desa_id', flat=True).distinct())
+        desa_lapor     = len(desa_sudah_ids)
+        persen         = round((desa_lapor / total_desa) * 100) if total_desa else 0
+        desa_list = sorted(
+            [{'nama': d.nama, 'sudah': d.id in desa_sudah_ids} for d in semua_desa],
+            key=lambda x: x['sudah']  # False (belum) duluan
+        )
+        return {
+            'lapor'    : desa_lapor,
+            'total'    : total_desa,
+            'persen'   : persen,
+            'desa_list': desa_list,
+        }
+
+    kepatuhan = {
+        'bumdes'  : hitung_kepatuhan(qs_bumdes),
+        'blt'     : hitung_kepatuhan(qs_blt),
+        'infra'   : hitung_kepatuhan(qs_infra),
+        'koperasi': hitung_kepatuhan(qs_koperasi),
+        'pangan'  : hitung_kepatuhan(qs_pangan),
+    }
+    kepatuhan_render = [
+        {'label': 'BUMDes',           **kepatuhan['bumdes']},
+        {'label': 'BLT Dana Desa',    **kepatuhan['blt']},
+        {'label': 'Infrastruktur',    **kepatuhan['infra']},
+        {'label': 'Koperasi',         **kepatuhan['koperasi']},
+        {'label': 'Ketahanan Pangan', **kepatuhan['pangan']},
+    ]
+
+    # ── Desa Belum Lapor Sama Sekali ──
+    desa_sudah = set()
+    for qs in [qs_bumdes, qs_blt, qs_infra, qs_koperasi, qs_pangan]:
+        desa_sudah.update(qs.values_list('desa_id', flat=True))
+
+    desa_belum_lapor = semua_desa.exclude(id__in=desa_sudah)
+
+    # ── Daftar Tahun untuk Filter ──
+    tahun_list = list(range(tahun_ini, tahun_ini - 5, -1))
+
     context = {
-        'stats': stats,
+        'stats'            : stats,
         'total_pending_all': total_pending_all,
-        'desa_labels': [d.nama for d in desa_qs],
-        'desa_counts': [d.jml_pengajuan for d in desa_qs],
-        'tahun_ini': datetime.date.today().year,
+        'total_disetujui'  : total_disetujui,
+        'total_ditolak'    : total_ditolak,
+        'total_draft'      : total_draft,
+        'total_semua'      : total_semua,
+        'desa_labels'      : [d.nama for d in desa_qs],
+        'desa_counts'      : [d.jml_pengajuan for d in desa_qs],
+        'rekap_desa'       : rekap_desa,
+        'kepatuhan'        : kepatuhan,
+        'kepatuhan_render' : kepatuhan_render,
+        'desa_belum_lapor' : desa_belum_lapor,
+        'tahun_ini'        : tahun_ini,
+        'tahun'            : tahun,
+        'tahun_list'       : tahun_list,
+        'total_desa'       : total_desa,
     }
     return render(request, 'dashboard_kecamatan.html', context)
 

@@ -1,16 +1,16 @@
 /* CARD */
 .modern-card {
-  background: #fff;
+  background: var(--card);
   border-radius: 20px;
   padding: 1.5rem;
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--border);
   transition: all 0.25s ease;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+  box-shadow: var(--shadow);
 }
 
 .modern-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-md);
 }
 
 /* HEADER */
@@ -32,12 +32,12 @@
   font-size: 20px;
 }
 
-/* WARNA ICON */
-.icon.purple { background: #f3e8ff; color: #a855f7; }
-.icon.orange { background: #fff7ed; color: #f97316; }
-.icon.blue   { background: #e0f2fe; color: #0ea5e9; }
-.icon.teal   { background: #ccfbf1; color: #14b8a6; }
-.icon.green  { background: #dcfce7; color: #22c55e; }
+/* WARNA ICON — semua ke variasi emerald */
+.icon.purple { background: #d1fae5; color: #047857; }
+.icon.orange { background: #a7f3d0; color: #065f46; }
+.icon.blue   { background: #ecfdf5; color: #059669; }
+.icon.teal   { background: #bbf7d0; color: #047857; }
+.icon.green  { background: #d1fae5; color: #10b981; }
 
 /* BADGE */
 .badge {
@@ -53,8 +53,8 @@
 }
 
 .badge.success {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--bg);
+  color: var(--primary-dark);
 }
 
 .badge.warning {
@@ -65,7 +65,7 @@
 /* TEXT */
 .desc {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted);
   margin-bottom: 10px;
 }
 
@@ -83,31 +83,33 @@
   margin-top: 12px;
   font-weight: 600;
   text-decoration: none;
-  color: #0f172a;
+  color: var(--text);
   transition: 0.2s;
 }
 
 .card-link:hover {
-  color: #10b981;
+  color: var(--primary-light);
 }
+
+/* STATUS BADGES */
 .badge-draft {
   background: #e5e7eb;
   color: #374151;
 }
 
 .badge-diajukan {
-  background: #facc15;
+  background: #fef9c3;
   color: #92400e;
 }
 
 .badge-disetujui {
-  background: #22c55e;
-  color: white;
+  background: var(--bg);
+  color: var(--primary-dark);
 }
 
 .badge-ditolak {
-  background: #ef4444;
-  color: white;
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .badge-gray {
@@ -115,6 +117,7 @@
   color: #6b7280;
 }
 
+/* STAT PILLS */
 .stat-pills {
   display: flex;
   flex-wrap: wrap;
@@ -129,12 +132,12 @@
   font-weight: 600;
 }
 
-.pill.draft      { background: #f1f5f9; color: #64748b; }
-.pill.diajukan   { background: #fef9c3; color: #a16207; }
-.pill.disetujui  { background: #dcfce7; color: #15803d; }
-.pill.ditolak    { background: #fee2e2; color: #b91c1c; }
+.pill.draft      { background: #f1f5f9;          color: #64748b; }
+.pill.diajukan   { background: #fef9c3;           color: #a16207; }
+.pill.disetujui  { background: var(--bg);         color: var(--primary-dark); }
+.pill.ditolak    { background: #fee2e2;            color: #b91c1c; }
 
-
+/* DONUT CHART */
 .donut-summary-wrap {
   display: flex;
   align-items: center;
@@ -156,11 +159,12 @@
   font-size: 2rem;
   font-weight: 700;
   line-height: 1;
+  color: var(--primary-dark);
 }
 
 .donut-center-label small {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .donut-legend-wrap {
@@ -193,10 +197,10 @@
 
 .donut-legend-item strong {
   font-weight: 600;
+  color: var(--text);
 }
 
 .donut-legend-item span:last-child {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 12px;
 }
-

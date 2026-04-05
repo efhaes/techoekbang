@@ -1,216 +1,323 @@
 {% extends 'includes/base.html' %}
+{% load static %}
 {% block page_title %}Detail BUMDes{% endblock %}
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kecamatan/bumdes/detail.css' %}">
+{% endblock %}
 {% block content %}
-<div class="page-header d-flex align-items-center justify-content-between">
-  <div>
-    <h4>{{ bumdes.nama_bumdes }}</h4>
-    <p>Desa {{ bumdes.desa.nama }}</p>
+
+<!-- ── BREADCRUMB ── -->
+<nav class="detail-breadcrumb">
+  <a href="{% url 'bumdes_list_kecamatan' %}">
+    <i class="bi bi-arrow-left"></i> Kembali ke Daftar BUMDes
+  </a>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<div class="detail-header">
+  <div class="detail-header-left">
+    <div class="detail-header-icon">
+      <i class="bi bi-shop"></i>
+    </div>
+    <div>
+      <h1 class="detail-title">{{ bumdes.nama_bumdes }}</h1>
+      <div class="detail-meta">
+        <span><i class="bi bi-geo-alt"></i> Desa {{ bumdes.desa.nama }}</span>
+        <span><i class="bi bi-calendar3"></i> Tahun {{ bumdes.tahun_anggaran }}</span>
+      </div>
+    </div>
   </div>
-  <span class="badge badge-{{ bumdes.status }} px-3 py-2" style="font-size:13px;">
-    {% if bumdes.status == 'draft' %}📝
-    {% elif bumdes.status == 'diajukan' %}⏳
-    {% elif bumdes.status == 'disetujui' %}✅
-    {% else %}❌{% endif %}
-    {{ bumdes.get_status_display }}
-  </span>
+  <div class="status-badge status-{{ bumdes.status }}">
+    {% if bumdes.status == 'draft' %}
+      <i class="bi bi-pencil-square"></i> Draft
+    {% elif bumdes.status == 'diajukan' %}
+      <i class="bi bi-hourglass-split"></i> Menunggu Verifikasi
+    {% elif bumdes.status == 'disetujui' %}
+      <i class="bi bi-check-circle-fill"></i> Disetujui
+    {% else %}
+      <i class="bi bi-x-circle-fill"></i> Ditolak
+    {% endif %}
+  </div>
 </div>
 
+<!-- ── ALERT CATATAN VERIFIKASI ── -->
 {% if bumdes.catatan_verifikasi %}
-<div class="alert-tolak mb-3">
-  <i class="bi bi-exclamation-triangle me-2"></i>
-  <strong>Catatan Verifikasi:</strong> {{ bumdes.catatan_verifikasi }}
+<div class="detail-alert-tolak">
+  <div class="alert-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+  <div>
+    <div class="alert-label">Catatan Penolakan dari Kecamatan</div>
+    <div class="alert-text">{{ bumdes.catatan_verifikasi }}</div>
+  </div>
 </div>
 {% endif %}
 
-<!-- IDENTITAS -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-file-text" style="color:var(--primary)"></i> Identitas BUMDes
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">Tahun Anggaran</div>
-      <div class="fw-semibold">{{ bumdes.tahun_anggaran }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Nama BUMDes</div>
-      <div class="fw-semibold">{{ bumdes.nama_bumdes|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Nomor SK</div>
-      <div class="fw-semibold">{{ bumdes.nomor_sk|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Nomor PERDES</div>
-      <div class="fw-semibold">{{ bumdes.nomor_perdes|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Tanggal PERDES</div>
-      <div class="fw-semibold">{{ bumdes.tanggal_perdes|default:"-" }}</div>
-    </div>
-  </div>
-</div>
+<!-- ── BODY LAYOUT ── -->
+<div class="detail-body">
 
-<!-- PENGURUS -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-people" style="color:var(--primary)"></i> Susunan Pengurus
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">Direktur</div>
-      <div class="fw-semibold">{{ bumdes.direktur|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Komisaris</div>
-      <div class="fw-semibold">{{ bumdes.komisaris|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Sekretaris</div>
-      <div class="fw-semibold">{{ bumdes.sekretaris|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Bendahara</div>
-      <div class="fw-semibold">{{ bumdes.bendahara|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Ketua Unit Usaha</div>
-      <div class="fw-semibold">{{ bumdes.ketua_unit_usaha|default:"-" }}</div>
-    </div>
-  </div>
-</div>
+  <!-- KOLOM KIRI: Identitas + Dokumen + Riwayat -->
+  <div class="detail-col-main">
 
-<!-- PENGAWAS -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-shield-check" style="color:var(--primary)"></i> Susunan Pengawas
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">Ketua Pengawas</div>
-      <div class="fw-semibold">{{ bumdes.ketua_pengawas|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Anggota Pengawas 1</div>
-      <div class="fw-semibold">{{ bumdes.anggota_pengawas_1|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Anggota Pengawas 2</div>
-      <div class="fw-semibold">{{ bumdes.anggota_pengawas_2|default:"-" }}</div>
-    </div>
-  </div>
-</div>
-
-<!-- DOKUMEN -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-paperclip" style="color:var(--primary)"></i> Dokumen
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">File SK</div>
-      <div class="fw-semibold">
-        {% if bumdes.file_sk %}
-        <a href="{{ bumdes.file_sk.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
+    <!-- IDENTITAS -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-file-earmark-text"></i>
+        <span>Identitas BUMDes</span>
+      </div>
+      <div class="section-body">
+        <div class="field-grid">
+          <div class="field-item">
+            <div class="field-label">Nama BUMDes</div>
+            <div class="field-value">{{ bumdes.nama_bumdes|default:"—" }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Tahun Anggaran</div>
+            <div class="field-value">{{ bumdes.tahun_anggaran }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Nomor SK</div>
+            <div class="field-value">{{ bumdes.nomor_sk|default:"—" }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Nomor PERDES</div>
+            <div class="field-value">{{ bumdes.nomor_perdes|default:"—" }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Tanggal PERDES</div>
+            <div class="field-value">{{ bumdes.tanggal_perdes|default:"—" }}</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Surat Pengantar</div>
-      <div class="fw-semibold">
-        {% if bumdes.file_surat_pengantar %}
-        <a href="{{ bumdes.file_surat_pengantar.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
+
+    <!-- DOKUMEN -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-paperclip"></i>
+        <span>Dokumen Lampiran</span>
+      </div>
+      <div class="section-body">
+        <div class="dokumen-list">
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">File SK</div>
+              <div class="dokumen-sub">Surat Keputusan BUMDes</div>
+            </div>
+            {% if bumdes.file_sk %}
+            <a href="{{ bumdes.file_sk.url }}" target="_blank" class="dokumen-btn">
+              <i class="bi bi-download"></i> Unduh
+            </a>
+            {% else %}
+            <span class="dokumen-empty">Belum ada file</span>
+            {% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">Surat Pengantar</div>
+              <div class="dokumen-sub">Surat pengantar dari desa</div>
+            </div>
+            {% if bumdes.file_surat_pengantar %}
+            <a href="{{ bumdes.file_surat_pengantar.url }}" target="_blank" class="dokumen-btn">
+              <i class="bi bi-download"></i> Unduh
+            </a>
+            {% else %}
+            <span class="dokumen-empty">Belum ada file</span>
+            {% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-check"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">Berita Acara</div>
+              <div class="dokumen-sub">Berita acara pembentukan</div>
+            </div>
+            {% if bumdes.file_berita_acara %}
+            <a href="{{ bumdes.file_berita_acara.url }}" target="_blank" class="dokumen-btn">
+              <i class="bi bi-download"></i> Unduh
+            </a>
+            {% else %}
+            <span class="dokumen-empty">Belum ada file</span>
+            {% endif %}
+          </div>
+
+        </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Berita Acara</div>
-      <div class="fw-semibold">
-        {% if bumdes.file_berita_acara %}
-        <a href="{{ bumdes.file_berita_acara.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
+
+    <!-- RIWAYAT -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-clock-history"></i>
+        <span>Riwayat Pengajuan</span>
+      </div>
+      <div class="section-body">
+        <div class="timeline">
+          <div class="timeline-item {% if bumdes.tanggal_diajukan %}active{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-label">Diajukan</div>
+              <div class="timeline-value">{{ bumdes.diajukan_oleh|default:"—" }}</div>
+              <div class="timeline-date">{{ bumdes.tanggal_diajukan|date:"d M Y, H:i"|default:"Belum diajukan" }}</div>
+            </div>
+          </div>
+          <div class="timeline-item {% if bumdes.tanggal_verifikasi %}active{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-label">Diverifikasi</div>
+              <div class="timeline-value">{{ bumdes.diverifikasi_oleh|default:"—" }}</div>
+              <div class="timeline-date">{{ bumdes.tanggal_verifikasi|date:"d M Y, H:i"|default:"Belum diverifikasi" }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- RIWAYAT -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-clock-history" style="color:var(--primary)"></i> Riwayat Pengajuan
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">Diajukan Oleh</div>
-      <div class="fw-semibold">{{ bumdes.diajukan_oleh|default:"-" }}</div>
+  </div><!-- /detail-col-main -->
+
+  <!-- KOLOM KANAN: Pengurus + Pengawas + Aksi -->
+  <div class="detail-col-side">
+
+    <!-- PENGURUS -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-people"></i>
+        <span>Susunan Pengurus</span>
+      </div>
+      <div class="section-body">
+        <div class="person-list">
+          <div class="person-item">
+            <div class="person-role">Direktur</div>
+            <div class="person-name">{{ bumdes.direktur|default:"—" }}</div>
+          </div>
+          <div class="person-item">
+            <div class="person-role">Komisaris</div>
+            <div class="person-name">{{ bumdes.komisaris|default:"—" }}</div>
+          </div>
+          <div class="person-item">
+            <div class="person-role">Sekretaris</div>
+            <div class="person-name">{{ bumdes.sekretaris|default:"—" }}</div>
+          </div>
+          <div class="person-item">
+            <div class="person-role">Bendahara</div>
+            <div class="person-name">{{ bumdes.bendahara|default:"—" }}</div>
+          </div>
+          <div class="person-item">
+            <div class="person-role">Ketua Unit Usaha</div>
+            <div class="person-name">{{ bumdes.ketua_unit_usaha|default:"—" }}</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Tanggal Diajukan</div>
-      <div class="fw-semibold">{{ bumdes.tanggal_diajukan|date:"d M Y H:i"|default:"-" }}</div>
+
+    <!-- PENGAWAS -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-shield-check"></i>
+        <span>Susunan Pengawas</span>
+      </div>
+      <div class="section-body">
+        <div class="person-list">
+          <div class="person-item">
+            <div class="person-role">Ketua Pengawas</div>
+            <div class="person-name">{{ bumdes.ketua_pengawas|default:"—" }}</div>
+          </div>
+          <div class="person-item">
+            <div class="person-role">Anggota Pengawas 1</div>
+            <div class="person-name">{{ bumdes.anggota_pengawas_1|default:"—" }}</div>
+          </div>
+          <div class="person-item">
+            <div class="person-role">Anggota Pengawas 2</div>
+            <div class="person-name">{{ bumdes.anggota_pengawas_2|default:"—" }}</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Diverifikasi Oleh</div>
-      <div class="fw-semibold">{{ bumdes.diverifikasi_oleh|default:"-" }}</div>
+
+    <!-- AKSI VERIFIKASI -->
+    {% if bumdes.status == 'diajukan' %}
+    <div class="detail-action-card">
+      <div class="action-card-title">
+        <i class="bi bi-check2-circle"></i> Tindakan Verifikasi
+      </div>
+      <p class="action-card-desc">
+        Periksa seluruh data dan dokumen sebelum mengambil keputusan verifikasi.
+      </p>
+      <div class="action-buttons">
+        <form method="POST" action="{% url 'bumdes_verifikasi' bumdes.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="disetujui">
+          <button type="submit" class="btn-setujui"
+            onclick="return confirm('Anda yakin menyetujui data BUMDes ini?')">
+            <i class="bi bi-check-lg"></i> Setujui
+          </button>
+        </form>
+        <button class="btn-tolak" data-bs-toggle="modal" data-bs-target="#modalTolak">
+          <i class="bi bi-x-lg"></i> Tolak
+        </button>
+      </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Tanggal Verifikasi</div>
-      <div class="fw-semibold">{{ bumdes.tanggal_verifikasi|date:"d M Y H:i"|default:"-" }}</div>
+    {% endif %}
+
+    {% if bumdes.status == 'disetujui' %}
+    <div class="detail-status-card disetujui">
+      <i class="bi bi-check-circle-fill"></i>
+      <div>
+        <div class="status-card-title">Sudah Disetujui</div>
+        <div class="status-card-sub">Data ini telah diverifikasi dan disetujui oleh kecamatan.</div>
+      </div>
     </div>
-  </div>
-</div>
+    {% endif %}
 
-<!-- BUTTON -->
-<div class="d-flex justify-content-end gap-2">
-  <a href="{% url 'bumdes_list_kecamatan' %}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-1"></i> Kembali
-  </a>
+    {% if bumdes.status == 'ditolak' %}
+    <div class="detail-status-card ditolak">
+      <i class="bi bi-x-circle-fill"></i>
+      <div>
+        <div class="status-card-title">Ditolak</div>
+        <div class="status-card-sub">Data ini ditolak. Desa perlu memperbaiki dan mengajukan ulang.</div>
+      </div>
+    </div>
+    {% endif %}
 
-  {% if bumdes.status == 'diajukan' %}
-  <form method="POST" action="{% url 'bumdes_verifikasi' bumdes.pk %}" class="d-inline">
-    {% csrf_token %}
-    <input type="hidden" name="status" value="disetujui">
-    <button type="submit" class="btn btn-success"
-      onclick="return confirm('Setujui BUMDes ini?')">
-      <i class="bi bi-check-lg me-1"></i> Setujui
-    </button>
-  </form>
+  </div><!-- /detail-col-side -->
 
-  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalTolak">
-    <i class="bi bi-x-lg me-1"></i> Tolak
-  </button>
-  {% endif %}
-</div>
+</div><!-- /detail-body -->
 
-<!-- Modal Tolak -->
+<!-- ── MODAL TOLAK ── -->
 <div class="modal fade" id="modalTolak" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content" style="border-radius:14px;">
-      <div class="modal-header border-0">
-        <h6 class="modal-title fw-bold">Tolak Permohonan</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content detail-modal">
+      <div class="modal-header detail-modal-header">
+        <div class="modal-header-icon"><i class="bi bi-x-circle-fill"></i></div>
+        <div>
+          <h5 class="modal-title">Tolak Permohonan BUMDes</h5>
+          <p class="modal-subtitle">{{ bumdes.nama_bumdes }} — Desa {{ bumdes.desa.nama }}</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{% url 'bumdes_verifikasi' bumdes.pk %}">
         {% csrf_token %}
         <input type="hidden" name="status" value="ditolak">
-        <div class="modal-body">
-          <label class="form-label">
+        <div class="modal-body detail-modal-body">
+          <label class="modal-field-label">
             Alasan Penolakan <span class="text-danger">*</span>
           </label>
-          <textarea name="catatan_verifikasi" class="form-control" rows="4"
-            placeholder="Tuliskan alasan penolakan..." required></textarea>
+          <textarea name="catatan_verifikasi" class="modal-textarea" rows="4"
+            placeholder="Contoh: Dokumen SK belum ditandatangani, data pengurus tidak lengkap..."
+            required></textarea>
+          <div class="modal-hint">
+            <i class="bi bi-info-circle"></i>
+            Alasan ini akan dikirimkan ke admin desa agar dapat diperbaiki.
+          </div>
         </div>
-        <div class="modal-footer border-0">
-          <button type="button" class="btn btn-outline-secondary btn-sm"
-            data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-danger btn-sm">
-            <i class="bi bi-x-lg me-1"></i> Tolak
+        <div class="modal-footer detail-modal-footer">
+          <button type="button" class="modal-btn-batal" data-bs-dismiss="modal">
+            Batal
+          </button>
+          <button type="submit" class="modal-btn-tolak">
+            <i class="bi bi-x-lg"></i> Konfirmasi Penolakan
           </button>
         </div>
       </form>

@@ -28,6 +28,11 @@ class LoginForm(forms.Form):
 
 
 class BuatAkunDesaForm(forms.ModelForm):
+    # TAMBAHKAN FIELD EMAIL
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contoh: desa.suka@gmail.com'})
+    )
+    
     username = forms.CharField(
         max_length=150,
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -45,24 +50,14 @@ class BuatAkunDesaForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password']
+        fields = ['username', 'email', 'password'] # Masukkan email ke sini
 
+    # Tambahkan validasi password agar tidak salah ketik
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        konfirmasi = cleaned_data.get('konfirmasi_password')
-        if password and konfirmasi and password != konfirmasi:
-            raise forms.ValidationError("Password tidak cocok.")
-        return cleaned_data
+        password = cleaned_data.get("password")
+        konfirmasi = cleaned_data.get("konfirmasi_password")
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password'])
-        if commit:
-            user.save()
-            UserProfile.objects.create(
-                user=user,
-                role='admin_desa',
-                desa=self.cleaned_data['desa']
-            )
-        return user
+        if password != konfirmasi:
+            raise forms.ValidationError("Password dan Konfirmasi Password tidak cocok!")
+        return cleaned_data

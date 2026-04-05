@@ -1,8 +1,9 @@
-  {% load static %}
+{% load static %}
 <div id="sidebar">
+
   <div class="sidebar-brand">
     <div class="brand-badge">
-        <img src="{% static 'img/logo.png' %}" class="brand-icon" alt="logo">
+      <img src="{% static 'img/logo.png' %}" class="brand-icon" alt="logo">
       <div>
         <div class="brand-text">EKBANG</div>
         <div class="brand-sub">Sistem Informasi Kecamatan</div>
@@ -22,54 +23,54 @@
     <div class="nav-label">Menu Utama</div>
 
     <a href="{% url 'dashboard_kecamatan' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'dashboard_kecamatan' %}active{% endif %}">
-      <i class="bi bi-speedometer2"></i> Dashboard
+       class="nav-item menu-dashboard {% if request.resolver_match.url_name == 'dashboard_kecamatan' %}active{% endif %}">
+      <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
     </a>
     <a href="{% url 'bumdes_list_kecamatan' %}"
-       class="nav-item {% if 'bumdes' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="bi bi-shop"></i> BUMDes
+       class="nav-item menu-bumdes {% if 'bumdes' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-shop"></i> <span>BUMDes</span>
     </a>
     <a href="{% url 'bltdd_list_kecamatan' %}"
-       class="nav-item {% if 'bltdd' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="bi bi-cash-stack"></i> BLT Dana Desa
+       class="nav-item menu-blt {% if 'bltdd' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-cash-stack"></i> <span>BLT Dana Desa</span>
     </a>
     <a href="{% url 'infrastruktur_list_kecamatan' %}"
-       class="nav-item {% if 'infrastruktur' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="bi bi-buildings"></i> Infrastruktur
+       class="nav-item menu-infra {% if 'infrastruktur' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-buildings"></i> <span>Infrastruktur</span>
     </a>
-
-    
     <a href="{% url 'koperasi_list_kecamatan' %}"
-       class="nav-item {% if 'koperasi' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="bi bi-people"></i> Koperasi
+       class="nav-item menu-koperasi {% if 'koperasi' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-people"></i> <span>Koperasi</span>
     </a>
     <a href="{% url 'ketahanan_pangan_list_kecamatan' %}"
-       class="nav-item {% if 'ketahanan_pangan' in request.resolver_match.url_name %}active{% endif %}">
-      <i class="bi bi-basket"></i> Ketahanan Pangan
+       class="nav-item menu-ketahanan {% if 'ketahanan_pangan' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-basket"></i> <span>Ketahanan Pangan</span>
     </a>
 
-    <div class="nav-label" style="margin-top:12px;">Manajemen</div>
-    <a href="{% url 'buat_akun_desa' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'buat_akun_desa' %}active{% endif %}">
-      <i class="bi bi-person-plus"></i> Buat Akun Desa
+    <div class="nav-label" style="margin-top: 12px;">Manajemen</div>
+
+    <a href="{% url 'akun_desa_list' %}"
+       class="nav-item menu-template {% if request.resolver_match.url_name == 'buat_akun_desa' %}active{% endif %}">
+      <i class="bi bi-person-plus"></i> <span>Buat Akun Desa</span>
     </a>
     <a href="{% url 'desa_create' %}"
-       class="nav-item {% if request.resolver_match.url_name == 'buat_akun_desa' %}active{% endif %}">
-      <i class="bi bi-person-plus"></i> Tambah Desa
+       class="nav-item menu-template {% if request.resolver_match.url_name == 'desa_create' %}active{% endif %}">
+      <i class="bi bi-geo-alt"></i> <span>Tambah Desa</span>
     </a>
-      <a href="{% url 'review_list' %}"
-    class="nav-item {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
-    <i class="bi bi-clipboard-check"></i> Review Permohonan
-    <span class="nav-badge" id="notif-badge" style="display:none;">0</span>
-  </a>
+    <a href="{% url 'review_list' %}"
+       class="nav-item menu-template {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="bi bi-clipboard-check"></i>
+      <span>Review Permohonan</span>
+      <span class="nav-badge" id="notif-badge" style="display:none;">0</span>
+    </a>
+
   </div>
 
-  <div class="sidebar-footer">
-   <form action="{% url 'logout' %}" method="POST">
-  {% csrf_token %}
-  <button type="submit" class="nav-item" style="color:#fca5a5; border:none; background:none;">
-    <i class="bi bi-box-arrow-left"></i> Logout
-  </button>
-</form>
-  </div>
+  <form action="{% url 'logout' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit" class="nav-item" style="color:#fca5a5; border:none; background:none;">
+      <i class="bi bi-box-arrow-left"></i> <span>Logout</span>
+    </button>
+  </form>
+
 </div>

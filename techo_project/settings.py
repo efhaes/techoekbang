@@ -26,7 +26,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -101,14 +101,17 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 10  # Menghindari request menggantung jika server lambat
 
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
+# Pastikan email ini sudah di-verify sebagai "Sender" di Brevo
 DEFAULT_FROM_EMAIL = 'Admin Eksbang <waduhxonepiece@gmail.com>'
 
 # Internationalization

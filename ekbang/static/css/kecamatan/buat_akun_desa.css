@@ -1,0 +1,131 @@
+/* ===== HEADER ===== */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.page-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ===== WRAPPER ===== */
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== CARD ===== */
+.form-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--card);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 1.8rem;
+  box-shadow: var(--shadow);
+}
+
+/* ===== FORM ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* INPUT */
+.form-group input,
+.form-group select {
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 0 12px;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(16,185,129,0.1);
+}
+
+/* ===== BUTTON ===== */
+.btn-submit {
+  width: 100%;
+  height: 42px;
+  border-radius: 10px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.btn-submit:hover {
+  background: #059669;
+}
+
+/* ===== ALERT ===== */
+.alert-custom {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 13px;
+  align-items: flex-start;
+}
+
+.alert-custom.success {
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #065f46;
+}
+
+.alert-custom.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.alert-custom i {
+  font-size: 18px;
+}
+
+/* SUB TEXT ALERT */
+.alert-sub {
+  font-size: 11px;
+  margin-top: 4px;
+  color: #047857;
+}
+
+/* ERROR TEXT */
+.error-text {
+  font-size: 11px;
+  color: #dc2626;
+  margin-top: 3px;
+}

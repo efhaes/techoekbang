@@ -81,10 +81,10 @@ def ketahanan_pangan_detail_kecamatan(request, pk):
     obj = get_object_or_404(
         KetahananPangan.objects.select_related(
             'desa', 'diajukan_oleh', 'diverifikasi_oleh'
-        ).prefetch_related('jenis_usaha'),                   # kembalikan prefetch — dibutuhkan di template
+        ),
         pk=pk,
     )
-    if obj.status == 'draft':                                # tambah guard
+    if obj.status == 'draft':
         messages.error(request, "Data belum diajukan oleh desa.")
         return redirect('ketahanan_pangan_list_kecamatan')
     return render(request, 'kecamatan/ketahanan_pangan/detail.html', {'obj': obj})

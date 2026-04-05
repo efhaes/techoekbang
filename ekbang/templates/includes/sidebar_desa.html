@@ -40,17 +40,14 @@
       <i class="bi bi-buildings"></i> Infrastruktur
     </a>
     <a href="{% url 'koperasi_list' %}"
-       class="nav-item menu-koperasi {% if 'koperasi' in request.resolver_match.url_name %}active{% endif %}">
+       class="nav-item menu-blt {% if 'koperasi' in request.resolver_match.url_name %}active{% endif %}">
       <i class="bi bi-people"></i> Koperasi
     </a>
     <a href="{% url 'ketahanan_pangan_list' %}"
        class="nav-item menu-ketahanan {% if 'ketahanan_pangan' in request.resolver_match.url_name %}active{% endif %}">
       <i class="bi bi-basket"></i> Ketahanan Pangan
     </a>
-    <a href="{% url 'template_dokumen' %}"
-      class="nav-item {% if request.resolver_match.url_name == 'template_dokumen' %}active{% endif %}">
-      <i class="bi bi-file-earmark-text"></i> Template Dokumen
-    </a>
+   
   </div>
 
    <form action="{% url 'logout' %}" method="POST">

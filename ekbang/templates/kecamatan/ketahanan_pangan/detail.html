@@ -1,279 +1,376 @@
 {% extends 'includes/base.html' %}
+{% load static %}
 {% block page_title %}Detail Ketahanan Pangan{% endblock %}
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kecamatan/pangan/detail.css' %}">
+{% endblock %}
 {% block content %}
-<div class="page-header d-flex align-items-center justify-content-between">
-  <div>
-    <h4>{{ obj.nama_kelompok }}</h4>
-    <p>Desa {{ obj.desa.nama }}</p>
-  </div>
-  <span class="badge badge-{{ obj.status }} px-3 py-2" style="font-size:13px;">
-    {% if obj.status == 'draft' %}📝
-    {% elif obj.status == 'diajukan' %}⏳
-    {% elif obj.status == 'disetujui' %}✅
-    {% else %}❌{% endif %}
-    {{ obj.get_status_display }}
-  </span>
-</div>
 
-{% if obj.catatan_verifikasi %}
-<div class="alert-tolak mb-3">
-  <i class="bi bi-exclamation-triangle me-2"></i>
-  <strong>Catatan Verifikasi:</strong> {{ obj.catatan_verifikasi }}
-</div>
-{% endif %}
+<!-- ── BREADCRUMB ── -->
+<nav class="detail-breadcrumb">
+  <a href="{% url 'ketahanan_pangan_list_kecamatan' %}">
+    <i class="bi bi-arrow-left"></i> Kembali ke Daftar Ketahanan Pangan
+  </a>
+</nav>
 
-<!-- IDENTITAS -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-file-text" style="color:var(--primary)"></i> Identitas Kelompok
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">Tahun Anggaran</div>
-      <div class="fw-semibold">{{ obj.tahun_anggaran }}</div>
+<!-- ── PAGE HEADER ── -->
+<div class="detail-header">
+  <div class="detail-header-left">
+    <div class="detail-header-icon">
+      <i class="bi bi-flower1"></i>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Nama Kelompok</div>
-      <div class="fw-semibold">{{ obj.nama_kelompok }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Ketua</div>
-      <div class="fw-semibold">{{ obj.ketua|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Nomor SK</div>
-      <div class="fw-semibold">{{ obj.nomor_sk|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Tanggal SK</div>
-      <div class="fw-semibold">{{ obj.tanggal_sk|date:"d M Y"|default:"-" }}</div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Pembiayaan Anggaran</div>
-      <div class="fw-semibold">
+    <div>
+      <h1 class="detail-title">{{ obj.nama_kelompok }}</h1>
+      <div class="detail-meta">
+        <span><i class="bi bi-geo-alt"></i> Desa {{ obj.desa.nama }}</span>
+        <span><i class="bi bi-calendar3"></i> Tahun {{ obj.tahun_anggaran }}</span>
         {% if obj.pembiayaan_anggaran %}
-          Rp {{ obj.pembiayaan_anggaran|floatformat:0 }}
-        {% else %}-{% endif %}
+        <span><i class="bi bi-cash"></i> Rp {{ obj.pembiayaan_anggaran|floatformat:0 }}</span>
+        {% endif %}
       </div>
     </div>
   </div>
-</div>
-
-<!-- JENIS USAHA -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-basket" style="color:var(--primary)"></i> Jenis Usaha Kelompok
-  </div>
-  <div class="row g-3">
-    <div class="col-md-2 col-4">
-      <div class="text-center p-3 rounded-3 {% if obj.usaha_pertanian %}bg-success bg-opacity-10 border border-success-subtle{% else %}bg-light{% endif %}">
-        <div style="font-size:28px;">🌾</div>
-        <div style="font-size:12px; font-weight:600; margin-top:6px;
-          {% if obj.usaha_pertanian %}color:#065f46{% else %}color:#9ca3af{% endif %}">
-          Pertanian
-        </div>
-        {% if obj.usaha_pertanian %}
-          <i class="bi bi-check-circle-fill text-success"></i>
-        {% else %}
-          <i class="bi bi-x-circle text-muted"></i>
-        {% endif %}
-      </div>
-    </div>
-    <div class="col-md-2 col-4">
-      <div class="text-center p-3 rounded-3 {% if obj.usaha_peternakan %}bg-success bg-opacity-10 border border-success-subtle{% else %}bg-light{% endif %}">
-        <div style="font-size:28px;">🐄</div>
-        <div style="font-size:12px; font-weight:600; margin-top:6px;
-          {% if obj.usaha_peternakan %}color:#065f46{% else %}color:#9ca3af{% endif %}">
-          Peternakan
-        </div>
-        {% if obj.usaha_peternakan %}
-          <i class="bi bi-check-circle-fill text-success"></i>
-        {% else %}
-          <i class="bi bi-x-circle text-muted"></i>
-        {% endif %}
-      </div>
-    </div>
-    <div class="col-md-2 col-4">
-      <div class="text-center p-3 rounded-3 {% if obj.usaha_perladangan %}bg-success bg-opacity-10 border border-success-subtle{% else %}bg-light{% endif %}">
-        <div style="font-size:28px;">🌿</div>
-        <div style="font-size:12px; font-weight:600; margin-top:6px;
-          {% if obj.usaha_perladangan %}color:#065f46{% else %}color:#9ca3af{% endif %}">
-          Perladangan
-        </div>
-        {% if obj.usaha_perladangan %}
-          <i class="bi bi-check-circle-fill text-success"></i>
-        {% else %}
-          <i class="bi bi-x-circle text-muted"></i>
-        {% endif %}
-      </div>
-    </div>
-    <div class="col-md-2 col-4">
-      <div class="text-center p-3 rounded-3 {% if obj.usaha_perdagangan %}bg-success bg-opacity-10 border border-success-subtle{% else %}bg-light{% endif %}">
-        <div style="font-size:28px;">🛒</div>
-        <div style="font-size:12px; font-weight:600; margin-top:6px;
-          {% if obj.usaha_perdagangan %}color:#065f46{% else %}color:#9ca3af{% endif %}">
-          Perdagangan
-        </div>
-        {% if obj.usaha_perdagangan %}
-          <i class="bi bi-check-circle-fill text-success"></i>
-        {% else %}
-          <i class="bi bi-x-circle text-muted"></i>
-        {% endif %}
-      </div>
-    </div>
-    <div class="col-md-2 col-4">
-      <div class="text-center p-3 rounded-3 {% if obj.usaha_perikanan %}bg-success bg-opacity-10 border border-success-subtle{% else %}bg-light{% endif %}">
-        <div style="font-size:28px;">🐟</div>
-        <div style="font-size:12px; font-weight:600; margin-top:6px;
-          {% if obj.usaha_perikanan %}color:#065f46{% else %}color:#9ca3af{% endif %}">
-          Perikanan
-        </div>
-        {% if obj.usaha_perikanan %}
-          <i class="bi bi-check-circle-fill text-success"></i>
-        {% else %}
-          <i class="bi bi-x-circle text-muted"></i>
-        {% endif %}
-      </div>
-    </div>
-    {% if obj.usaha_lainnya %}
-    <div class="col-md-12">
-      <div class="text-muted small">Lainnya</div>
-      <div class="fw-semibold">{{ obj.usaha_lainnya }}</div>
-    </div>
+  <div class="status-badge status-{{ obj.status }}">
+    {% if obj.status == 'draft' %}
+      <i class="bi bi-pencil-square"></i> Draft
+    {% elif obj.status == 'diajukan' %}
+      <i class="bi bi-hourglass-split"></i> Menunggu Verifikasi
+    {% elif obj.status == 'disetujui' %}
+      <i class="bi bi-check-circle-fill"></i> Disetujui
+    {% else %}
+      <i class="bi bi-x-circle-fill"></i> Ditolak
     {% endif %}
   </div>
 </div>
 
-<!-- DOKUMEN -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-paperclip" style="color:var(--primary)"></i> Dokumen
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">File SK</div>
-      <div class="fw-semibold">
-        {% if obj.file_sk %}
-        <a href="{{ obj.file_sk.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">File Proposal</div>
-      <div class="fw-semibold">
-        {% if obj.proposal %}
-        <a href="{{ obj.proposal.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">File LPJ</div>
-      <div class="fw-semibold">
-        {% if obj.file_lpj_ketahanan %}
-        <a href="{{ obj.file_lpj_ketahanan.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Surat Pengantar</div>
-      <div class="fw-semibold">
-        {% if obj.file_surat_pengantar %}
-        <a href="{{ obj.file_surat_pengantar.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Berita Acara</div>
-      <div class="fw-semibold">
-        {% if obj.file_berita_acara %}
-        <a href="{{ obj.file_berita_acara.url }}" target="_blank">
-          <i class="bi bi-file-earmark-arrow-down"></i> Unduh
-        </a>
-        {% else %}-{% endif %}
-      </div>
-    </div>
+<!-- ── ALERT CATATAN VERIFIKASI ── -->
+{% if obj.catatan_verifikasi %}
+<div class="detail-alert-tolak">
+  <div class="alert-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+  <div>
+    <div class="alert-label">Catatan Penolakan dari Kecamatan</div>
+    <div class="alert-text">{{ obj.catatan_verifikasi }}</div>
   </div>
 </div>
+{% endif %}
 
-<!-- RIWAYAT -->
-<div class="form-card">
-  <div class="form-section-title">
-    <i class="bi bi-clock-history" style="color:var(--primary)"></i> Riwayat Pengajuan
-  </div>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="text-muted small">Diajukan Oleh</div>
-      <div class="fw-semibold">{{ obj.diajukan_oleh|default:"-" }}</div>
+<!-- ── BODY LAYOUT ── -->
+<div class="detail-body">
+
+  <!-- KOLOM KIRI -->
+  <div class="detail-col-main">
+
+    <!-- IDENTITAS KELOMPOK -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-file-earmark-text"></i>
+        <span>Identitas Kelompok</span>
+      </div>
+      <div class="section-body">
+        <div class="field-grid">
+          <div class="field-item">
+            <div class="field-label">Nama Kelompok</div>
+            <div class="field-value">{{ obj.nama_kelompok }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Tahun Anggaran</div>
+            <div class="field-value">{{ obj.tahun_anggaran }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Ketua Kelompok</div>
+            <div class="field-value">{{ obj.ketua|default:"—" }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Nomor SK</div>
+            <div class="field-value">{{ obj.nomor_sk|default:"—" }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Tanggal SK</div>
+            <div class="field-value">{{ obj.tanggal_sk|date:"d M Y"|default:"—" }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Pembiayaan Anggaran</div>
+            <div class="field-value field-value-money">
+              {% if obj.pembiayaan_anggaran %}
+                Rp {{ obj.pembiayaan_anggaran|floatformat:0 }}
+              {% else %}—{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Tanggal Diajukan</div>
-      <div class="fw-semibold">{{ obj.tanggal_diajukan|date:"d M Y H:i"|default:"-" }}</div>
+
+    <!-- JENIS USAHA -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-basket"></i>
+        <span>Jenis Usaha Kelompok</span>
+      </div>
+      <div class="section-body">
+        <div class="usaha-grid">
+
+          <div class="usaha-item {% if obj.usaha_pertanian %}aktif{% endif %}">
+            <div class="usaha-icon">🌾</div>
+            <div class="usaha-label">Pertanian</div>
+            <div class="usaha-check">
+              {% if obj.usaha_pertanian %}
+                <i class="bi bi-check-circle-fill"></i>
+              {% else %}
+                <i class="bi bi-x-circle"></i>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="usaha-item {% if obj.usaha_peternakan %}aktif{% endif %}">
+            <div class="usaha-icon">🐄</div>
+            <div class="usaha-label">Peternakan</div>
+            <div class="usaha-check">
+              {% if obj.usaha_peternakan %}
+                <i class="bi bi-check-circle-fill"></i>
+              {% else %}
+                <i class="bi bi-x-circle"></i>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="usaha-item {% if obj.usaha_perladangan %}aktif{% endif %}">
+            <div class="usaha-icon">🌿</div>
+            <div class="usaha-label">Perladangan</div>
+            <div class="usaha-check">
+              {% if obj.usaha_perladangan %}
+                <i class="bi bi-check-circle-fill"></i>
+              {% else %}
+                <i class="bi bi-x-circle"></i>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="usaha-item {% if obj.usaha_perdagangan %}aktif{% endif %}">
+            <div class="usaha-icon">🛒</div>
+            <div class="usaha-label">Perdagangan</div>
+            <div class="usaha-check">
+              {% if obj.usaha_perdagangan %}
+                <i class="bi bi-check-circle-fill"></i>
+              {% else %}
+                <i class="bi bi-x-circle"></i>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="usaha-item {% if obj.usaha_perikanan %}aktif{% endif %}">
+            <div class="usaha-icon">🐟</div>
+            <div class="usaha-label">Perikanan</div>
+            <div class="usaha-check">
+              {% if obj.usaha_perikanan %}
+                <i class="bi bi-check-circle-fill"></i>
+              {% else %}
+                <i class="bi bi-x-circle"></i>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+
+        {% if obj.usaha_lainnya %}
+        <div class="usaha-lainnya">
+          <div class="field-label">Usaha Lainnya</div>
+          <div class="field-value">{{ obj.usaha_lainnya }}</div>
+        </div>
+        {% endif %}
+      </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Diverifikasi Oleh</div>
-      <div class="fw-semibold">{{ obj.diverifikasi_oleh|default:"-" }}</div>
+
+  </div><!-- /detail-col-main -->
+
+  <!-- KOLOM KANAN -->
+  <div class="detail-col-side">
+
+    <!-- DOKUMEN LAMPIRAN -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-paperclip"></i>
+        <span>Dokumen Lampiran</span>
+      </div>
+      <div class="section-body">
+        <div class="dokumen-list">
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">File SK</div>
+              <div class="dokumen-sub">Surat Keputusan Kelompok</div>
+            </div>
+            {% if obj.file_sk %}
+              <a href="{{ obj.file_sk.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">File Proposal</div>
+              <div class="dokumen-sub">Proposal kegiatan kelompok</div>
+            </div>
+            {% if obj.proposal %}
+              <a href="{{ obj.proposal.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-check"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">File LPJ</div>
+              <div class="dokumen-sub">Laporan Pertanggungjawaban</div>
+            </div>
+            {% if obj.file_lpj_ketahanan %}
+              <a href="{{ obj.file_lpj_ketahanan.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">Surat Pengantar</div>
+              <div class="dokumen-sub">Surat pengantar dari desa</div>
+            </div>
+            {% if obj.file_surat_pengantar %}
+              <a href="{{ obj.file_surat_pengantar.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-ruled"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">Berita Acara</div>
+              <div class="dokumen-sub">Berita acara kegiatan</div>
+            </div>
+            {% if obj.file_berita_acara %}
+              <a href="{{ obj.file_berita_acara.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+        </div>
+      </div>
     </div>
-    <div class="col-md-4">
-      <div class="text-muted small">Tanggal Verifikasi</div>
-      <div class="fw-semibold">{{ obj.tanggal_verifikasi|date:"d M Y H:i"|default:"-" }}</div>
+
+    <!-- AKSI VERIFIKASI -->
+    {% if obj.status == 'diajukan' %}
+    <div class="detail-action-card">
+      <div class="action-card-title">
+        <i class="bi bi-check2-circle"></i> Tindakan Verifikasi
+      </div>
+      <p class="action-card-desc">
+        Periksa seluruh data dan dokumen sebelum mengambil keputusan verifikasi.
+      </p>
+      <div class="action-buttons">
+        <form method="POST" action="{% url 'ketahanan_pangan_verifikasi' obj.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="disetujui">
+          <button type="submit" class="btn-setujui"
+            onclick="return confirm('Anda yakin menyetujui data ketahanan pangan ini?')">
+            <i class="bi bi-check-lg"></i> Setujui
+          </button>
+        </form>
+        <button class="btn-tolak" data-bs-toggle="modal" data-bs-target="#modalTolak">
+          <i class="bi bi-x-lg"></i> Tolak
+        </button>
+      </div>
     </div>
-  </div>
-</div>
+    {% endif %}
 
-<!-- BUTTON -->
-<div class="d-flex justify-content-end gap-2">
-  <a href="{% url 'ketahanan_pangan_list_kecamatan' %}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-1"></i> Kembali
-  </a>
+    {% if obj.status == 'disetujui' %}
+    <div class="detail-status-card disetujui">
+      <i class="bi bi-check-circle-fill"></i>
+      <div>
+        <div class="status-card-title">Sudah Disetujui</div>
+        <div class="status-card-sub">Data ini telah diverifikasi dan disetujui oleh kecamatan.</div>
+      </div>
+    </div>
+    {% endif %}
 
-  {% if obj.status == 'diajukan' %}
-  <form method="POST" action="{% url 'ketahanan_pangan_verifikasi' obj.pk %}" class="d-inline">
-    {% csrf_token %}
-    <input type="hidden" name="status" value="disetujui">
-    <button type="submit" class="btn btn-success"
-      onclick="return confirm('Setujui data ketahanan pangan ini?')">
-      <i class="bi bi-check-lg me-1"></i> Setujui
-    </button>
-  </form>
+    {% if obj.status == 'ditolak' %}
+    <div class="detail-status-card ditolak">
+      <i class="bi bi-x-circle-fill"></i>
+      <div>
+        <div class="status-card-title">Ditolak</div>
+        <div class="status-card-sub">Data ini ditolak. Desa perlu memperbaiki dan mengajukan ulang.</div>
+      </div>
+    </div>
+    {% endif %}
 
-  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalTolak">
-    <i class="bi bi-x-lg me-1"></i> Tolak
-  </button>
-  {% endif %}
-</div>
+    <!-- RIWAYAT PENGAJUAN -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-clock-history"></i>
+        <span>Riwayat Pengajuan</span>
+      </div>
+      <div class="section-body">
+        <div class="timeline">
+          <div class="timeline-item {% if obj.tanggal_diajukan %}active{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-label">Diajukan</div>
+              <div class="timeline-value">{{ obj.diajukan_oleh|default:"—" }}</div>
+              <div class="timeline-date">{{ obj.tanggal_diajukan|date:"d M Y, H:i"|default:"Belum diajukan" }}</div>
+            </div>
+          </div>
+          <div class="timeline-item {% if obj.tanggal_verifikasi %}active{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-label">Diverifikasi</div>
+              <div class="timeline-value">{{ obj.diverifikasi_oleh|default:"—" }}</div>
+              <div class="timeline-date">{{ obj.tanggal_verifikasi|date:"d M Y, H:i"|default:"Belum diverifikasi" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<!-- Modal Tolak -->
+  </div><!-- /detail-col-side -->
+
+</div><!-- /detail-body -->
+
+<!-- ── MODAL TOLAK ── -->
 <div class="modal fade" id="modalTolak" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content" style="border-radius:14px;">
-      <div class="modal-header border-0">
-        <h6 class="modal-title fw-bold">Tolak Permohonan</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content detail-modal">
+      <div class="modal-header detail-modal-header">
+        <div class="modal-header-icon"><i class="bi bi-x-circle-fill"></i></div>
+        <div>
+          <h5 class="modal-title">Tolak Permohonan Ketahanan Pangan</h5>
+          <p class="modal-subtitle">{{ obj.nama_kelompok }} — Desa {{ obj.desa.nama }}</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{% url 'ketahanan_pangan_verifikasi' obj.pk %}">
         {% csrf_token %}
         <input type="hidden" name="status" value="ditolak">
-        <div class="modal-body">
-          <label class="form-label">
+        <div class="modal-body detail-modal-body">
+          <label class="modal-field-label">
             Alasan Penolakan <span class="text-danger">*</span>
           </label>
-          <textarea name="catatan_verifikasi" class="form-control" rows="4"
-            placeholder="Tuliskan alasan penolakan..." required></textarea>
+          <textarea name="catatan_verifikasi" class="modal-textarea" rows="4"
+            placeholder="Contoh: Proposal tidak lengkap, SK belum dilampirkan..."
+            required></textarea>
+          <div class="modal-hint">
+            <i class="bi bi-info-circle"></i>
+            Alasan ini akan dikirimkan ke admin desa agar dapat diperbaiki.
+          </div>
         </div>
-        <div class="modal-footer border-0">
-          <button type="button" class="btn btn-outline-secondary btn-sm"
-            data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-danger btn-sm">
-            <i class="bi bi-x-lg me-1"></i> Tolak
+        <div class="modal-footer detail-modal-footer">
+          <button type="button" class="modal-btn-batal" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="modal-btn-tolak">
+            <i class="bi bi-x-lg"></i> Konfirmasi Penolakan
           </button>
         </div>
       </form>

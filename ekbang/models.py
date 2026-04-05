@@ -80,6 +80,7 @@ class UserProfile(models.Model):
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    is_email_verified = models.BooleanField(default=False)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     desa = models.ForeignKey(
         Desa,
@@ -87,6 +88,8 @@ class UserProfile(models.Model):
         null=True, blank=True,
         help_text='Wajib diisi jika role Admin Desa',
     )
+    email_verification_token = models.UUIDField(null=True, blank=True)
+    token_created_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name        = 'User Profile'

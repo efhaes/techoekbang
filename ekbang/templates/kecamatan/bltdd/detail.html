@@ -1,121 +1,291 @@
 {% extends 'includes/base.html' %}
 {% load static %}
-
+{% block page_title %}Detail BLT Dana Desa{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/kecamatan/infrastruktur/detail.css' %}">
+{% endblock %}
 {% block content %}
-<style>
-    /* ... (Style tetap sama, gue ringkas biar fokus ke logic field) ... */
-    .document-wrapper { background-color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; font-family: 'Segoe UI', sans-serif; padding-top: 40px; padding-bottom: 100px; }
-    .paper { width: 100%; max-width: 800px; padding: 40px; position: relative; color: #334155; }
-    .verif-title { border-bottom: 2px solid #e2e8f0; margin-bottom: 30px; padding-bottom: 15px; }
-    .verif-title h4 { font-weight: 800; margin: 0; color: #1e293b; }
-    .section-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-top: 25px; margin-bottom: 15px; letter-spacing: 1px; }
-    .data-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #f1f5f9; }
-    .data-item label { display: block; font-size: 0.85rem; color: #64748b; margin-bottom: 4px; }
-    .data-item span { display: block; font-size: 1.1rem; font-weight: 600; color: #0f172a; }
-    .doc-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; }
-    .btn-unduh { text-decoration: none; background: #f1f5f9; color: #475569; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
-    .status-badge { position: absolute; top: 40px; right: 40px; padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
-    .status-diajukan { background: #fef3c7; color: #92400e; }
-    .status-disetujui { background: #dcfce7; color: #166534; }
-    .action-bar { position: fixed; bottom: 30px; background: #1e293b; padding: 12px 25px; border-radius: 50px; display: flex; gap: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-</style>
 
-<div class="document-wrapper">
-    <div class="nav-back" style="width: 100%; max-width: 800px; margin-bottom: 15px;">
-        <a href="{% url 'bltdd_list_kecamatan' %}" class="text-decoration-none text-muted fw-bold small">
-            <i class="bi bi-chevron-left"></i> KEMBALI KE DAFTAR
-        </a>
+<!-- ── BREADCRUMB ── -->
+<nav class="detail-breadcrumb">
+  <a href="{% url 'bltdd_list_kecamatan' %}">
+    <i class="bi bi-arrow-left"></i> Kembali ke Daftar BLT Dana Desa
+  </a>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<div class="detail-header">
+  <div class="detail-header-left">
+    <div class="detail-header-icon">
+      <i class="bi bi-cash-stack"></i>
     </div>
-
-    <div class="paper">
-        <div class="status-badge {% if obj.status == 'diajukan' %}status-diajukan{% else %}status-disetujui{% endif %}">
-            {{ obj.get_status_display }}
-        </div>
-
-        <div class="verif-title">
-            <h4>Verifikasi Penyaluran BLT-DD</h4>
-            <p>ID Pengajuan: #{{ obj.id }} &bull; TA {{ obj.tahun_anggaran }}</p>
-        </div>
-
-       <div class="section-label">Informasi Wilayah & Pengajuan</div>
-        <div class="data-grid">
-            <div class="data-item">
-                <label>Desa</label>
-                <span>{{ obj.desa.nama }}</span>
-            </div>
-            <div class="data-item">
-                <label>Kecamatan</label>
-                <span>{{ obj.desa.kecamatan }}</span>
-            </div>
-            <div class="data-item">
-                <label>Tahun Anggaran</label>
-                <span>{{ obj.tahun_anggaran }}</span>
-            </div>
-            <div class="data-item">
-                <label>Nomor SK Penetapan</label>
-                <span>{{ obj.nomor_sk|default:"—" }}</span>
-            </div>
-            <div class="data-item">
-                <label>Jumlah KPM</label>
-                <span>{{ obj.jumlah_kpm }} KK</span>
-            </div>
-            <div class="data-item">
-                <label>Total Anggaran</label>
-                <span>Rp {{ obj.jumlah_total_terima|floatformat:0 }}</span>
-            </div>
-        </div>
-
-        <div class="section-label">Dokumen Lampiran (Sesuai Database)</div>
-        <div class="doc-list">
-            
-            <div class="doc-item">
-                <div>
-                    <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
-                    <span class="fw-bold">SK Penerima BLT</span>
-                </div>
-                {% if obj.file_sk %}
-                    <a href="{{ obj.file_sk.url }}" class="btn-unduh" target="_blank">Lihat/Unduh</a>
-                {% else %}
-                    <span class="text-muted small italic">File SK Kosong</span>
-                {% endif %}
-            </div>
-
-            <div class="doc-item">
-                <div>
-                    <i class="bi bi-file-earmark-check text-primary me-2"></i>
-                    <span class="fw-bold">LPJ Bulan Sebelumnya</span>
-                </div>
-                {% if obj.lpj_bulan_sebelumnya %}
-                    <a href="{{ obj.lpj_bulan_sebelumnya.url }}" class="btn-unduh" target="_blank">Lihat/Unduh</a>
-                {% else %}
-                    <span class="text-muted small italic">File LPJ Kosong</span>
-                {% endif %}
-            </div>
-
-            <div class="doc-item">
-                <div>
-                    <i class="bi bi-file-earmark-text text-success me-2"></i>
-                    <span class="fw-bold">Berita Acara / Pengantar</span>
-                </div>
-                {% if obj.file_berita_acara %}
-                    <a href="{{ obj.file_berita_acara.url }}" class="btn-unduh" target="_blank">Lihat/Unduh</a>
-                {% else %}
-                    <span class="text-muted small italic">File Berita Acara Kosong</span>
-                {% endif %}
-            </div>
-        </div>
+    <div>
+      <h1 class="detail-title">BLT Dana Desa — {{ obj.desa.nama }}</h1>
+      <div class="detail-meta">
+        <span><i class="bi bi-geo-alt"></i> Desa {{ obj.desa.nama }}</span>
+        <span><i class="bi bi-calendar3"></i> Tahun {{ obj.tahun_anggaran }}</span>
+        <span><i class="bi bi-people"></i> {{ obj.jumlah_kpm }} KPM</span>
+        <span><i class="bi bi-cash"></i> Rp {{ obj.jumlah_total_terima|floatformat:0 }}</span>
+      </div>
     </div>
-
-    <div class="action-bar">
-        {% if obj.status == 'diajukan' %}
-        <form method="POST" action="{% url 'bltdd_verifikasi' obj.pk %}">
-            {% csrf_token %}
-            <input type="hidden" name="status" value="disetujui">
-            <button type="submit" class="btn btn-success btn-sm fw-bold px-3 rounded-pill">Setujui</button>
-        </form>
-        <button class="btn btn-outline-light btn-sm fw-bold px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#modalTolak">Tolak</button>
-        {% endif %}
-        <button onclick="window.print()" class="btn btn-secondary btn-sm fw-bold px-3 rounded-pill">Cetak PDF</button>
-    </div>
+  </div>
+  <div class="status-badge status-{{ obj.status }}">
+    {% if obj.status == 'draft' %}
+      <i class="bi bi-pencil-square"></i> Draft
+    {% elif obj.status == 'diajukan' %}
+      <i class="bi bi-hourglass-split"></i> Menunggu Verifikasi
+    {% elif obj.status == 'disetujui' %}
+      <i class="bi bi-check-circle-fill"></i> Disetujui
+    {% else %}
+      <i class="bi bi-x-circle-fill"></i> Ditolak
+    {% endif %}
+  </div>
 </div>
+
+<!-- ── ALERT CATATAN VERIFIKASI ── -->
+{% if obj.catatan_verifikasi %}
+<div class="detail-alert-tolak">
+  <div class="alert-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+  <div>
+    <div class="alert-label">Catatan Penolakan dari Kecamatan</div>
+    <div class="alert-text">{{ obj.catatan_verifikasi }}</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── BODY LAYOUT ── -->
+<div class="detail-body">
+
+  <!-- KOLOM KIRI -->
+  <div class="detail-col-main">
+
+    <!-- INFORMASI PENYALURAN -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-file-earmark-text"></i>
+        <span>Informasi Penyaluran</span>
+      </div>
+      <div class="section-body">
+        <div class="field-grid">
+          <div class="field-item">
+            <div class="field-label">Desa</div>
+            <div class="field-value">{{ obj.desa.nama }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Kecamatan</div>
+            <div class="field-value">{{ obj.desa.kecamatan }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Tahun Anggaran</div>
+            <div class="field-value">{{ obj.tahun_anggaran }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Nomor SK Penetapan</div>
+            <div class="field-value">{{ obj.nomor_sk|default:"—" }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Jumlah KPM</div>
+            <div class="field-value">{{ obj.jumlah_kpm }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Nominal per Bulan</div>
+            <div class="field-value">Rp {{ obj.nominal_per_bulan|floatformat:0 }}</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Jumlah Bulan</div>
+            <div class="field-value">{{ obj.jumlah_bulan }} bulan</div>
+          </div>
+          <div class="field-item">
+            <div class="field-label">Total Anggaran</div>
+            <div class="field-value field-value-money">Rp {{ obj.jumlah_total_terima|floatformat:0 }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /detail-col-main -->
+
+  <!-- KOLOM KANAN -->
+  <div class="detail-col-side">
+
+    <!-- DOKUMEN LAMPIRAN -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-paperclip"></i>
+        <span>Dokumen Lampiran</span>
+      </div>
+      <div class="section-body">
+        <div class="dokumen-list">
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">SK Penerima BLT</div>
+              <div class="dokumen-sub">Surat Keputusan penerima manfaat</div>
+            </div>
+            {% if obj.file_sk %}
+              <a href="{{ obj.file_sk.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-check"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">LPJ Bulan Sebelumnya</div>
+              <div class="dokumen-sub">Laporan pertanggungjawaban sebelumnya</div>
+            </div>
+            {% if obj.lpj_bulan_sebelumnya %}
+              <a href="{{ obj.lpj_bulan_sebelumnya.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">Surat Pengantar</div>
+              <div class="dokumen-sub">Surat pengantar dari desa</div>
+            </div>
+            {% if obj.file_surat_pengantar %}
+              <a href="{{ obj.file_surat_pengantar.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+          <div class="dokumen-item">
+            <div class="dokumen-icon"><i class="bi bi-file-earmark-ruled"></i></div>
+            <div class="dokumen-info">
+              <div class="dokumen-label">Berita Acara</div>
+              <div class="dokumen-sub">Berita acara penyaluran</div>
+            </div>
+            {% if obj.file_berita_acara %}
+              <a href="{{ obj.file_berita_acara.url }}" target="_blank" class="dokumen-btn">
+                <i class="bi bi-download"></i> Unduh
+              </a>
+            {% else %}<span class="dokumen-empty">Belum ada</span>{% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- AKSI VERIFIKASI -->
+    {% if obj.status == 'diajukan' %}
+    <div class="detail-action-card">
+      <div class="action-card-title">
+        <i class="bi bi-check2-circle"></i> Tindakan Verifikasi
+      </div>
+      <p class="action-card-desc">
+        Periksa seluruh data dan dokumen sebelum mengambil keputusan verifikasi.
+      </p>
+      <div class="action-buttons">
+        <form method="POST" action="{% url 'bltdd_verifikasi' obj.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="disetujui">
+          <button type="submit" class="btn-setujui"
+            onclick="return confirm('Anda yakin menyetujui BLT Dana Desa ini?')">
+            <i class="bi bi-check-lg"></i> Setujui
+          </button>
+        </form>
+        <button class="btn-tolak" data-bs-toggle="modal" data-bs-target="#modalTolak">
+          <i class="bi bi-x-lg"></i> Tolak
+        </button>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if obj.status == 'disetujui' %}
+    <div class="detail-status-card disetujui">
+      <i class="bi bi-check-circle-fill"></i>
+      <div>
+        <div class="status-card-title">Sudah Disetujui</div>
+        <div class="status-card-sub">Data ini telah diverifikasi dan disetujui oleh kecamatan.</div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if obj.status == 'ditolak' %}
+    <div class="detail-status-card ditolak">
+      <i class="bi bi-x-circle-fill"></i>
+      <div>
+        <div class="status-card-title">Ditolak</div>
+        <div class="status-card-sub">Data ini ditolak. Desa perlu memperbaiki dan mengajukan ulang.</div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- RIWAYAT -->
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="bi bi-clock-history"></i>
+        <span>Riwayat Pengajuan</span>
+      </div>
+      <div class="section-body">
+        <div class="timeline">
+          <div class="timeline-item {% if obj.tanggal_diajukan %}active{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-label">Diajukan</div>
+              <div class="timeline-value">{{ obj.diajukan_oleh|default:"—" }}</div>
+              <div class="timeline-date">{{ obj.tanggal_diajukan|date:"d M Y, H:i"|default:"Belum diajukan" }}</div>
+            </div>
+          </div>
+          <div class="timeline-item {% if obj.tanggal_verifikasi %}active{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-label">Diverifikasi</div>
+              <div class="timeline-value">{{ obj.diverifikasi_oleh|default:"—" }}</div>
+              <div class="timeline-date">{{ obj.tanggal_verifikasi|date:"d M Y, H:i"|default:"Belum diverifikasi" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /detail-col-side -->
+
+</div><!-- /detail-body -->
+
+<!-- ── MODAL TOLAK ── -->
+<div class="modal fade" id="modalTolak" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content detail-modal">
+      <div class="modal-header detail-modal-header">
+        <div class="modal-header-icon"><i class="bi bi-x-circle-fill"></i></div>
+        <div>
+          <h5 class="modal-title">Tolak Permohonan BLT Dana Desa</h5>
+          <p class="modal-subtitle">Desa {{ obj.desa.nama }} — TA {{ obj.tahun_anggaran }}</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'bltdd_verifikasi' obj.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="ditolak">
+        <div class="modal-body detail-modal-body">
+          <label class="modal-field-label">
+            Alasan Penolakan <span class="text-danger">*</span>
+          </label>
+          <textarea name="catatan_verifikasi" class="modal-textarea" rows="4"
+            placeholder="Contoh: SK penerima belum ditandatangani, LPJ bulan lalu belum dilampirkan..."
+            required></textarea>
+          <div class="modal-hint">
+            <i class="bi bi-info-circle"></i>
+            Alasan ini akan dikirimkan ke admin desa agar dapat diperbaiki.
+          </div>
+        </div>
+        <div class="modal-footer detail-modal-footer">
+          <button type="button" class="modal-btn-batal" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="modal-btn-tolak">
+            <i class="bi bi-x-lg"></i> Konfirmasi Penolakan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
