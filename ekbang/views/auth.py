@@ -302,13 +302,56 @@ def kirim_ulang_verifikasi(request, user_id):
 
 @login_required
 @kecamatan_required
+def desa_list(request):
+    data = Desa.objects.all().order_by('-id')
+    form = DesaForm()
+    return render(request, 'auth/desa_list.html', {
+        'data': data,
+        'form': form
+    })
+
+
+@login_required
+@kecamatan_required
 def desa_create(request):
-    form = DesaForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, "Data desa berhasil ditambahkan.")
-        return redirect('desa_create')
-    return render(request, 'kecamatan/desa_form.html', {'form': form})
+    if request.method == 'POST':
+        form = DesaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Data desa berhasil ditambahkan.")
+            return redirect('desa_list')
+    else:
+        form = DesaForm()
+
+    return render(request, 'auth/buat_desa.html', {
+        'form': form
+    })
+
+
+@login_required
+@kecamatan_required
+def desa_edit(request, id):
+    desa = get_object_or_404(Desa, id=id)
+
+    if request.method == 'POST':
+        form = DesaForm(request.POST, instance=desa)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error'})
+
+
+@login_required
+@kecamatan_required
+def desa_delete(request, id):
+    desa = get_object_or_404(Desa, id=id)
+
+    if request.method == 'POST':
+        desa.delete()
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error'})
 
 # ─────────────────────────────────────────
 # DASHBOARD KECAMATAN

@@ -5,7 +5,7 @@ from ekbang.views.auth import (
     dashboard_kecamatan, dashboard_desa, review_list, notifikasi_count,
     kirim_peringatan_masal, verifikasi_email, edit_akun_desa, hapus_akun_desa,
     akun_desa_list,            # <--- NEW: Import ini
-    kirim_ulang_verifikasi     # <--- NEW: Import ini
+    kirim_ulang_verifikasi,desa_list,desa_edit,desa_delete   # <--- NEW: Import ini
 )
 
 urlpatterns = [
@@ -23,8 +23,13 @@ urlpatterns = [
     path('dashboard/kecamatan/', dashboard_kecamatan, name='dashboard_kecamatan'),
     path('dashboard/desa/', dashboard_desa, name='dashboard_desa'),
     path('review/', review_list, name='review_list'),
-    path('dashboard/desa_create/', desa_create, name='desa_create'),
+    path('dashboard/tambah-desa/', desa_list, name='desa_list'),
+    path('dashboard/tambah-desa/create/', desa_create, name='desa_create'),
+    path('dashboard/tambah-desa/edit/<int:id>/', desa_edit, name='desa_edit'),
+    path('dashboard/tambah-desa/delete/<int:id>/', desa_delete, name='desa_delete'),
+
     path('api/notifikasi/', notifikasi_count, name='notifikasi_count'),
     path('kirim-peringatan-masal/', kirim_peringatan_masal, name='kirim_peringatan_masal'),
     path('verifikasi-email/<uidb64>/<token>/', verifikasi_email, name='verifikasi_email'),
+    
 ]

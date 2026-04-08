@@ -1,0 +1,39 @@
+{% extends 'includes/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth/desa_form.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Tambah Desa</h2>
+  <p>Isi data desa dengan benar dan lengkap</p>
+</div>
+
+<div class="form-wrapper">
+  <div class="form-card">
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label>Nama Desa</label>
+        {{ form.nama }}
+      </div>
+
+      <div class="form-group">
+        <label>Kecamatan</label>
+        {{ form.kecamatan }}
+      </div>
+
+      <button type="submit" class="btn-submit">
+        Simpan Data
+      </button>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

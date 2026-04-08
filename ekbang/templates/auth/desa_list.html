@@ -1,0 +1,185 @@
+{% extends 'includes/base.html' %}
+{%load static%}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth/desa_list.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h2>Data Desa</h2>
+    <p>{{ data|length }} desa terdaftar</p>
+  </div>
+  <a href="{% url 'desa_create' %}" class="btn-tambah">
+    <i class="bi bi-plus-lg"></i> Tambah Desa
+  </a>
+</div>
+
+<div class="desa-grid">
+  {% for d in data %}
+  <div class="desa-card" id="row-{{ d.id }}">
+    <div class="desa-card-body">
+      <div class="desa-icon-wrap">
+        <i class="bi bi-geo-alt-fill"></i>
+      </div>
+      <div class="desa-info">
+        <div class="desa-nama nama">{{ d.nama }}</div>
+        <div class="desa-kec kecamatan">
+          <i class="bi bi-map"></i> {{ d.kecamatan }}
+        </div>
+      </div>
+    </div>
+    <div class="desa-card-footer">
+      <button class="btn-edit"
+        data-id="{{ d.id }}"
+        data-nama="{{ d.nama|escapejs }}"
+        data-kecamatan="{{ d.kecamatan|escapejs }}">
+        <i class="bi bi-pencil"></i> Edit
+      </button>
+      <button class="btn-delete" data-id="{{ d.id }}">
+        <i class="bi bi-trash"></i> Hapus
+      </button>
+    </div>
+  </div>
+  {% empty %}
+  <div class="desa-empty">
+    <i class="bi bi-geo-alt"></i>
+    <p>Belum ada data desa terdaftar.</p>
+    <a href="{% url 'desa_create' %}" class="btn-tambah">
+      <i class="bi bi-plus-lg"></i> Tambah Sekarang
+    </a>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- MODAL EDIT -->
+<div id="editModal" class="modal">
+  <div class="modal-box">
+    <h4><i class="bi bi-pencil me-2"></i>Edit Desa</h4>
+    <form id="formEdit">
+      {% csrf_token %}
+      <input type="hidden" id="editId">
+      <div class="mfield">
+        <label>Nama Desa</label>
+        <input type="text" id="editNama" name="nama" placeholder="Nama Desa" required>
+      </div>
+      <div class="mfield">
+        <label>Kecamatan</label>
+        <input type="text" id="editKecamatan" name="kecamatan" placeholder="Kecamatan" required>
+      </div>
+      <div class="mactions">
+        <button type="button" class="mbtn-cancel" onclick="closeModal('editModal')">Batal</button>
+        <button type="submit" class="mbtn-submit" id="btnUpdate">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DELETE -->
+<div id="deleteModal" class="modal">
+  <div class="modal-box">
+    <div class="mdelete-icon"><i class="bi bi-trash"></i></div>
+    <h4>Hapus Data Desa?</h4>
+    <p>Data akan dihapus secara permanen dan tidak bisa dikembalikan.</p>
+    <div class="mactions">
+      <button type="button" class="mbtn-cancel" onclick="closeModal('deleteModal')">Batal</button>
+      <button class="mbtn-danger" id="confirmDelete">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let deleteId = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".btn-edit").forEach(btn =>
+    btn.addEventListener("click", function () { openEdit(this); })
+  );
+  document.querySelectorAll(".btn-delete").forEach(btn =>
+    btn.addEventListener("click", function () { openDelete(this.dataset.id); })
+  );
+});
+
+function openEdit(btn) {
+  document.getElementById("editId").value        = btn.dataset.id;
+  document.getElementById("editNama").value      = btn.dataset.nama;
+  document.getElementById("editKecamatan").value = btn.dataset.kecamatan;
+  showModal("editModal");
+}
+
+document.getElementById("formEdit").onsubmit = function (e) {
+  e.preventDefault();
+  const id       = document.getElementById("editId").value;
+  const formData = new FormData(this);
+  const btn      = document.getElementById("btnUpdate");
+  btn.disabled   = true;
+  btn.innerText  = "Menyimpan...";
+
+  fetch(`/dashboard/desa_edit/${id}/`, {
+    method: "POST", body: formData,
+    headers: { "X-CSRFToken": getCookie("csrftoken") }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === "success") {
+      const card = document.getElementById(`row-${id}`);
+      card.querySelector(".desa-nama").innerText = formData.get("nama");
+      card.querySelector(".desa-kec").innerHTML  =
+        `<i class="bi bi-map"></i> ${formData.get("kecamatan")}`;
+      const eb = card.querySelector(".btn-edit");
+      eb.dataset.nama      = formData.get("nama");
+      eb.dataset.kecamatan = formData.get("kecamatan");
+      showToast("Data berhasil diperbarui ✓");
+      closeModal("editModal");
+    } else { showToast("Gagal update data", true); }
+    btn.disabled  = false;
+    btn.innerText = "Simpan";
+  });
+};
+
+function openDelete(id) { deleteId = id; showModal("deleteModal"); }
+
+document.getElementById("confirmDelete").onclick = function () {
+  fetch(`/dashboard/desa_delete/${deleteId}/`, {
+    method: "POST",
+    headers: { "X-CSRFToken": getCookie("csrftoken") }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === "success") {
+      const card = document.getElementById(`row-${deleteId}`);
+      card.style.transition = "all 0.25s ease";
+      card.style.opacity    = "0";
+      card.style.transform  = "scale(0.95)";
+      setTimeout(() => card.remove(), 250);
+      showToast("Data berhasil dihapus");
+      closeModal("deleteModal");
+    } else { showToast("Gagal menghapus", true); }
+  });
+};
+
+function showModal(id)  { document.getElementById(id).style.display = "flex"; }
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
+window.onclick = e => { if (e.target.classList.contains("modal")) e.target.style.display = "none"; };
+
+function showToast(msg, error = false) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.className = "toast show " + (error ? "error" : "success");
+  setTimeout(() => { t.className = "toast"; }, 2500);
+}
+
+function getCookie(name) {
+  let v = null;
+  document.cookie.split(";").forEach(c => {
+    if (c.trim().startsWith(name + "=")) v = decodeURIComponent(c.split("=")[1]);
+  });
+  return v;
+}
+</script>
+{% endblock %}

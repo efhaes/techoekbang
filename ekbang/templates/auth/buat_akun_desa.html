@@ -1,7 +1,7 @@
 {% extends 'includes/base.html' %}
 {%load static%}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/kecamatan/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/auth/akun_desa_form.css' %}">
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -12,7 +12,6 @@
 <div class="form-wrapper">
   <div class="form-card">
 
-    <!-- ALERT -->
     {% if messages %}
       {% for msg in messages %}
         <div class="alert-custom success">
@@ -50,10 +49,17 @@
       <div class="form-group">
         <label>Email Desa</label>
         {{ form.email }}
-        <small>Email harus aktif untuk verifikasi.</small>
         {% if form.email.errors %}
           <span class="error-text">{{ form.email.errors }}</span>
         {% endif %}
+        <!-- Peringatan email aktif -->
+        <div class="email-notice">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>
+            Pastikan email yang diisi <strong>aktif dan dapat diakses</strong> oleh pihak desa.
+            Link verifikasi akan dikirim ke alamat ini — akun tidak dapat digunakan sebelum diverifikasi.
+          </span>
+        </div>
       </div>
 
       <div class="form-group">

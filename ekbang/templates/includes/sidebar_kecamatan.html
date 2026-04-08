@@ -53,7 +53,7 @@
        class="nav-item menu-template {% if request.resolver_match.url_name == 'buat_akun_desa' %}active{% endif %}">
       <i class="bi bi-person-plus"></i> <span>Buat Akun Desa</span>
     </a>
-    <a href="{% url 'desa_create' %}"
+    <a href="{% url 'desa_list' %}"
        class="nav-item menu-template {% if request.resolver_match.url_name == 'desa_create' %}active{% endif %}">
       <i class="bi bi-geo-alt"></i> <span>Tambah Desa</span>
     </a>
