@@ -1,12 +1,12 @@
   {% load static %}
-<div id="sidebar">
+<div id="sidebar" class="sidebar-scrollable">
   <div class="sidebar-brand">
     <div class="brand-badge">
 
         <img src="{% static 'img/logo.png' %}" class="brand-icon" alt="logo">
 
       <div>
-        <div class="brand-text">EKBANG</div>
+        <div class="brand-text">SIMANDAT</div>
         <div class="brand-sub">Desa {{ request.user.profile.desa.nama }}</div>
       </div>
     </div>
@@ -50,11 +50,15 @@
    
   </div>
 
-   <form action="{% url 'logout' %}" method="POST">
-  {% csrf_token %}
-  <button type="submit" class="nav-item" style="color:#fca5a5; border:none; background:none;">
-    <i class="bi bi-box-arrow-left"></i> Logout
-  </button>
-</form>
-    
+  
+  <div class="sidebar-logout">
+  <form action="{% url 'logout' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn">
+      <i class="bi bi-box-arrow-left"></i>
+      <span>Logout</span>
+    </button>
+  </form>
+</div>
+
 </div>

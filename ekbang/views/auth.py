@@ -398,11 +398,11 @@ def dashboard_kecamatan(request):
     # ── Chart Bar: Sebaran per Desa (top 10) ──
     desa_qs = Desa.objects.annotate(
         jml_pengajuan=(
-            Count('bumdes',          distinct=True) +
-            Count('bltdd',           distinct=True) +
-            Count('infrastruktur',   distinct=True) +
-            Count('koperasi',        distinct=True) +
-            Count('ketahananpangan', distinct=True)
+            Count('bumdes',          distinct=True, filter=Q(bumdes__tahun_anggaran=tahun)) +
+            Count('bltdd',           distinct=True, filter=Q(bltdd__tahun_anggaran=tahun)) +
+            Count('infrastruktur',   distinct=True, filter=Q(infrastruktur__tahun_anggaran=tahun)) +
+            Count('koperasi',        distinct=True, filter=Q(koperasi__tahun_anggaran=tahun)) +
+            Count('ketahananpangan', distinct=True, filter=Q(ketahananpangan__tahun_anggaran=tahun))
         )
     ).order_by('-jml_pengajuan')[:10]
 

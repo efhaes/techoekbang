@@ -1,5 +1,3 @@
-
-
 {% block content %}
 {% load static %}
 <!DOCTYPE html>
@@ -7,113 +5,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — Sistem Informasi Ekbang</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Login — SIMANDAT Kecamatan Rumpin</title>
+  <link rel="icon" type="image/x-icon"
+      href="{% static 'img/favicon.ico' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body>
 
-<!-- Background effects -->
-<div class="bg-wrap">
-  <div class="bg-grid"></div>
-  <div class="bg-glow g1"></div>
-  <div class="bg-glow g2"></div>
-  <div class="bg-bar"></div>
-  <div class="bg-bar"></div>
-  <div class="bg-bar"></div>
-</div>
-
-<div class="page">
-
-  <!-- Left Panel -->
-  <div class="left-panel">
-    <div class="gov-badge">Sistem Informasi Pemerintahan</div>
-
-    <h1 class="left-title">
-      Ekbang<br>
-      <span>Kecamatan Rumpin</span>
-
-    </h1>
-
-    <p class="left-desc">
-      Platform terpadu pengelolaan data ekonomi dan pembangunan desa.
-      Transparansi, akuntabilitas, dan efisiensi administrasi dalam satu sistem.
-    </p>
-
-    <div class="stat-row">
-      <div class="stat-pill">
-        <div class="num">5</div>
-        <div class="lbl">Modul Aktif</div>
-      </div>
-      <div class="stat-pill">
-        <div class="num">2</div>
-        <div class="lbl">Tingkat Akses</div>
-      </div>
-      <div class="stat-pill">
-        <div class="num">100%</div>
-        <div class="lbl">Digital</div>
-      </div>
-    </div>
+  <!-- Background layer -->
+  <div class="bg">
+    <div class="bg-grid"></div>
+    <div class="bg-circle c1"></div>
+    <div class="bg-circle c2"></div>
+    <div class="bg-circle c3"></div>
   </div>
 
-  <!-- Right Panel -->
-  <div class="right-panel">
-    <div class="login-card">
+  <!-- Centered wrapper -->
+  <main class="page">
+    <div class="card">
 
- <div class="emblem">
-  <img src="{% static 'img/logo.png' %}" alt="Logo" style="height:72px; object-fit:contain; margin-bottom:16px;">
-  <h2>Masuk ke Sistem</h2>
-  <p>Sistem Informasi Ekbang Kecamatan Rumpin</p>
-</div>
+      <!-- Top accent bar -->
+      <div class="card-bar"></div>
 
-      <div class="divider"></div>
+      <!-- Logo & App Identity -->
+      <div class="identity">
+        <div class="logo-ring">
+          <img src="{% static 'img/logo.png' %}" alt="Logo SIMANDAT" class="logo-img">
+        </div>
 
+        <div class="identity-text">
+          <h1 class="app-name">SIMANDAT</h1>
+          <p class="app-full">Sistem Informasi Manajemen Data</p>
+          <p class="app-sub">Ekonomi &amp; Pembangunan · Kecamatan Rumpin</p>
+        </div>
+
+        <!-- Info pills -->
+        <div class="pill-row">
+          <span class="pill">
+            <svg class="pill-icon" viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>
+            5 Modul Aktif
+          </span>
+          <span class="pill">
+            <svg class="pill-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            2 Level Akses
+          </span>
+          <span class="pill">
+            <svg class="pill-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Terenkripsi
+          </span>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>Masuk ke akun Anda</span>
+      </div>
+
+      <!-- Alert messages -->
       {% if messages %}
         {% for msg in messages %}
-          <div class="alert">⚠ {{ msg }}</div>
+          <div class="alert">
+            <svg class="alert-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            {{ msg }}
+          </div>
         {% endfor %}
       {% endif %}
 
-      <form method="POST">
+      <!-- Login form -->
+      <form method="POST" class="form">
         {% csrf_token %}
 
-        <div class="form-group">
-          <label class="form-label">Username</label>
-          <input
-            type="text"
-            name="username"
-            class="form-control"
-            placeholder="Masukkan username"
-            autocomplete="username"
-            required
-          >
+        <div class="field">
+          <label for="id_username">Username</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <input
+              type="text"
+              id="id_username"
+              name="username"
+              placeholder="Masukkan username"
+              autocomplete="username"
+              required
+            >
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input
-            type="password"
-            name="password"
-            class="form-control"
-            placeholder="Masukkan password"
-            autocomplete="current-password"
-            required
-          >
+        <div class="field">
+          <label for="id_password">Password</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            <input
+              type="password"
+              id="id_password"
+              name="password"
+              placeholder="Masukkan password"
+              autocomplete="current-password"
+              required
+            >
+            <button type="button" class="toggle-pw" onclick="togglePassword()" aria-label="Tampilkan password">
+              <svg id="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="btn-login">
-          Masuk &rarr;
+          Masuk ke Sistem
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </button>
       </form>
 
-      <div class="card-footer-note">
-        Hanya untuk pengguna terdaftar &bull; Hubungi admin jika lupa akses
-      </div>
+      <!-- Card footer -->
+      
 
     </div>
-  </div>
 
-</div>
+    <!-- Below card credit -->
+    <p class="below-card">© 2025 Kecamatan Rumpin · Pemerintah Kabupaten Bogor · Techo </p>
+  </main>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('id_password');
+      const icon = document.getElementById('eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/>';
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    }
+  </script>
 
 </body>
 </html>

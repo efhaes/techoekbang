@@ -29,32 +29,36 @@ def bltdd_list(request):
 @desa_required
 def bltdd_create(request):
     desa = request.user.profile.desa
+    tahun_target = int(request.GET.get('tahun', datetime.date.today().year))
 
-    form = BLTDDForm(request.POST or None, request.FILES or None)
+    # Cek Kuota (Maks 4 Pengajuan)
+    jumlah = BLTDD.objects.filter(
+        desa=desa, tahun_anggaran=tahun_target
+    ).exclude(status='ditolak').count()
 
-    if request.method == 'POST':
-        if form.is_valid():
-            tahun_form = form.cleaned_data['tahun_anggaran']  # ← ambil dari cleaned_data
+    if jumlah >= 4:
+        messages.error(request, f"Jatah input BLT-DD tahun {tahun_target} sudah maksimal 4.")
+        return redirect('bltdd_list')
 
-            existing = BLTDD.objects.filter(
-                desa=desa,
-                tahun_anggaran=tahun_form,
-            ).exclude(status='ditolak').first()
+    form = BLTDDForm(request.POST or None, request.FILES or None, initial={'tahun_anggaran': tahun_target})
 
-            if existing:
-                messages.warning(request, "Data BLT-DD tahun ini sudah ada. Silakan edit data yang ada.")
-            else:
-                obj               = form.save(commit=False)
-                obj.desa          = desa
-                obj.status        = 'draft'
-                obj.save()
-                messages.success(request, "Data BLT-DD berhasil disimpan sebagai draft.")
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
+    if request.method == 'POST' and form.is_valid():
+        obj        = form.save(commit=False)
+        obj.desa   = desa
+        obj.status = 'draft'
+        obj.save()
+        messages.success(request, "Data BLT-DD berhasil disimpan sebagai draft.")
+        return redirect('bltdd_list')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(request, f"{field}: {error}")
 
-    return redirect('bltdd_list')
+    return render(request, 'desa/bltdd/form.html', {
+        'form': form,
+        'title': f'Tambah BLT-DD Tahun {tahun_target}',
+        'is_edit': False
+    })
 
 
 @login_required

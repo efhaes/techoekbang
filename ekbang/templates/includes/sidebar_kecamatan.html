@@ -1,11 +1,11 @@
 {% load static %}
-<div id="sidebar">
+<div id="sidebar" class="sidebar-scrollable">
 
   <div class="sidebar-brand">
     <div class="brand-badge">
       <img src="{% static 'img/logo.png' %}" class="brand-icon" alt="logo">
       <div>
-        <div class="brand-text">EKBANG</div>
+        <div class="brand-text">SIMANDAT</div>
         <div class="brand-sub">Sistem Informasi Kecamatan</div>
       </div>
     </div>
@@ -57,20 +57,22 @@
        class="nav-item menu-template {% if request.resolver_match.url_name == 'desa_create' %}active{% endif %}">
       <i class="bi bi-geo-alt"></i> <span>Tambah Desa</span>
     </a>
-    <a href="{% url 'review_list' %}"
-       class="nav-item menu-template {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
+    <span class="nav-item menu-template disabled" style="opacity:0.5; cursor:not-allowed; pointer-events:none;">
       <i class="bi bi-clipboard-check"></i>
       <span>Review Permohonan</span>
       <span class="nav-badge" id="notif-badge" style="display:none;">0</span>
-    </a>
+    </span>
 
   </div>
 
+  <div class="sidebar-logout">
   <form action="{% url 'logout' %}" method="POST">
     {% csrf_token %}
-    <button type="submit" class="nav-item" style="color:#fca5a5; border:none; background:none;">
-      <i class="bi bi-box-arrow-left"></i> <span>Logout</span>
+    <button type="submit" class="logout-btn">
+      <i class="bi bi-box-arrow-left"></i>
+      <span>Logout</span>
     </button>
   </form>
+</div>
 
 </div>

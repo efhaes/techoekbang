@@ -17,10 +17,18 @@ def bltdd_list_kecamatan(request):
     desa_filter       = request.GET.get('desa', '')            # tambah
     tahun, tahun_list = get_tahun_context(request)
 
+    # Get all desa and add "Semua Desa" option
+    desa_objects = list(Desa.objects.all())
+    semua_desa = type('Desa', (), {
+        'pk': 0,
+        'nama': 'Semua Desa'
+    })()
+    desa_list = desa_objects + [semua_desa]
+
     return render(request, 'kecamatan/bltdd/list.html', {
         'status_filter': status_filter,
         'desa_filter':   desa_filter,                          # tambah
-        'desa_list':     Desa.objects.all(),                   # tambah
+        'desa_list':     desa_list,                            # tambah
         'tahun':         tahun,
         'tahun_list':    tahun_list,
     })
@@ -33,18 +41,28 @@ def bltdd_filter_api(request):
     desa_id = request.GET.get('desa_id')
     status_filter = request.GET.get('status', '')
 
-    if not tahun or not desa_id:
-        return JsonResponse({'error': 'Parameter tahun dan desa_id wajib diisi'}, status=400)
+    if not tahun:
+        return JsonResponse({'error': 'Parameter tahun wajib diisi'}, status=400)
 
-    qs = BLTDD.objects.select_related('desa', 'diajukan_oleh').filter(
-        tahun_anggaran=tahun,
-        desa_id=desa_id
-    ).exclude(status='draft').order_by('-tanggal_diajukan')
+    # Handle "Semua Desa" case (desa_id = 0)
+    if desa_id == '0':
+        qs = BLTDD.objects.select_related('desa', 'diajukan_oleh').filter(
+            tahun_anggaran=tahun
+        ).exclude(status='draft').order_by('-tanggal_diajukan')
+        
+        summary_qs = BLTDD.objects.filter(tahun_anggaran=tahun).exclude(status='draft')
+    else:
+        qs = BLTDD.objects.select_related('desa', 'diajukan_oleh').filter(
+            tahun_anggaran=tahun,
+            desa_id=desa_id
+        ).exclude(status='draft').order_by('-tanggal_diajukan')
+        
+        summary_qs = BLTDD.objects.filter(tahun_anggaran=tahun, desa_id=desa_id).exclude(status='draft')
 
     if status_filter in ('diajukan', 'disetujui', 'ditolak'):
         qs = qs.filter(status=status_filter)
 
-    summary = BLTDD.objects.filter(tahun_anggaran=tahun, desa_id=desa_id).exclude(status='draft').aggregate(
+    summary = summary_qs.aggregate(
         total_diajukan=Count('id', filter=Q(status='diajukan')),
         total_disetujui=Count('id', filter=Q(status='disetujui')),
         total_ditolak=Count('id', filter=Q(status='ditolak')),

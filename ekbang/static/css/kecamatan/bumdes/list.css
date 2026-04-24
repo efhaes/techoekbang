@@ -47,6 +47,12 @@
   margin-bottom: 2rem;
 }
 
+/* ── Semua Desa Card ── */
+.card-item.semua-desa {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 2px solid var(--primary);
+}
+
 /* ── Card Item (Tahun & Desa) ── */
 .card-item {
   background: var(--card);
