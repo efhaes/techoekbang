@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -45,7 +46,7 @@
           style="width:320px; border-radius:12px; border:1px solid var(--border); box-shadow: var(--shadow-md);">
           <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
             <span class="fw-bold" style="font-size:13px;">Permohonan Masuk</span>
-            <a href="{% url 'review_list' %}" style="font-size:12px; color:var(--primary);">Lihat Semua</a>
+            <a href="{% url 'bumdes_list_kecamatan' %}" style="font-size:12px; color:var(--primary);">Lihat Semua</a>
           </div>
           <div id="notif-list" style="max-height:320px; overflow-y:auto;">
             <div class="text-center py-4 text-muted" style="font-size:13px;" id="notif-empty">

@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['simandat.techo.id', '168.231.123.63']
 
 
 # Application definition
@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'techo_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'simandat',
+        'USER': 'simandat',
+        'PASSWORD': 'Wira20040401',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -129,6 +133,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+STATIC_ROOT = '/var/www/simandat/techoekbang/staticfiles'
 STATIC_URL = 'static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
